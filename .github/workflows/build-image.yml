@@ -38,7 +38,7 @@ jobs:
         ports:
           - 5432:5432
         volumes:
-          - __pgdata__:/var/lib/postgresql/data
+          - pgdata:/var/lib/postgresql/data
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
@@ -56,8 +56,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client curl unzip gdal-bin
 
+      # Docker on GH Actions is going to be unhappy if I use __pgdata__ as a volume name,
+      # so I'm going to use a different name for the volume and then rename it, since the
+      # Dockerfile expects the folder to be named __pgdata__.
       - name: Populate the database
-        run: __scripts__/refresh_pgdata_folder.sh
+        run: |
+          __scripts__/refresh_pgdata_folder.sh pgdata && \
+          mv pgdata __pgdata__
 
       # Uses the `docker/login-action` action to log in to the Container registry registry using the account and password that will publish the packages. Once published, the packages are scoped to the account defined here.
       - name: Log in to the Container registry
