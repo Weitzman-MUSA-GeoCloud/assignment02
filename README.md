@@ -33,7 +33,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
             stop_lon DOUBLE PRECISION,
             zone_id TEXT,
             stop_url TEXT,
-            location_type TEXT,
+            location_type INTEGER,
             parent_station TEXT,
             stop_timezone TEXT,
             wheelchair_boarding INTEGER
@@ -62,12 +62,12 @@ There are several datasets that are prescribed for you to use in this part. Belo
             service_id TEXT,
             trip_id TEXT,
             trip_headsign TEXT,
-            block_id TEXT,
             trip_short_name TEXT,
             direction_id TEXT,
+            block_id TEXT,
             shape_id TEXT,
-            wheelchair_accessible TEXT,
-            bikes_allowed TEXT
+            wheelchair_accessible INTEGER,
+            bikes_allowed INTEGER
         );
         ```
 *   `septa.bus_shapes` ([SEPTA GTFS](https://github.com/septadev/GTFS/releases))
