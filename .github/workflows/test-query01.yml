@@ -1,7 +1,10 @@
 name: Test Query 01
 on:
+  pull_request:
+    branches: [ main ]
   push:
     branches: [ main ]
+    paths: [ '**/run_tests.sh', '**01**' ]
 
 jobs:
   build:
@@ -29,6 +32,8 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+        volumes:
+          - /var/lib/postgresql/data:/var/lib/postgresql/data
 
     steps:
     - uses: actions/checkout@v3

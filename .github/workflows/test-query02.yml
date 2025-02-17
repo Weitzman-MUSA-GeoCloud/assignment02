@@ -1,7 +1,10 @@
 name: Test Query 02
 on:
+  pull_request:
+    branches: [ main ]
   push:
     branches: [ main ]
+    paths: [ '**/run_tests.sh', '**02**' ]
 
 jobs:
   build:
