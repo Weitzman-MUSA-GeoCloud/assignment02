@@ -5,9 +5,12 @@ set -x
 
 CURDIR=$(readlink -f $(dirname $0))
 SCRIPTDIR=${CURDIR}
-PGDATADIR=${CURDIR}/../__pgdata__
 DATADIR=${CURDIR}/../__data__
 ENTRYPOINTS=${CURDIR}/../__entrypoints__
+
+# Set up a default pgdata directory, or use the first argument as the pgdata
+# directory.
+PGDATADIR=${1:-${CURDIR}/../__pgdata__}
 
 DOCKER_POSTGRES_HOST=localhost
 DOCKER_POSTGRES_PORT=15432
