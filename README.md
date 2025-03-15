@@ -159,7 +159,31 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
 1.  Which **eight** bus stop have the largest population within 800 meters? As a rough estimation, consider any block group that intersects the buffer as being part of the 800 meter buffer.
 
+| Rank | Stop Name                 | Estimated Population (800m) |
+|------|---------------------------|-----------------------------|
+| 1    | Lombard St & 18th St      | 57,936                      |
+| 2    | Rittenhouse Sq & 18th ... | 57,571                      |
+| 3    | Snyder Av & 9th St        | 57,412                      |
+| 4    | Lombard St & 19th St      | 57,019                      |
+| 5    | 19th St & Lombard St      | 57,019                      |
+| 6    | Locust St & 16th St       | 56,309                      |
+| 7    | 16th St & Locust St       | 56,309                      |
+| 8    | South St & 19th St        | 55,789                      |
+
+
 2.  Which **eight** bus stops have the smallest population above 500 people _inside of Philadelphia_ within 800 meters of the stop (Philadelphia county block groups have a geoid prefix of `42101` -- that's `42` for the state of PA, and `101` for Philadelphia county)?
+
+| Rank | Stop Name                        | Estimated Population (800m) |
+|------|----------------------------------|-----------------------------|
+| 1    | Delaware Av & Venango St         | 593                         |
+| 2    | Delaware Av & Tioga St           | 593                         |
+| 3    | Delaware Av & Castor Av          | 593                         |
+| 4    | Northwestern Av & Stenton Av     | 655                         |
+| 5    | Stenton Av & Northwestern Av     | 655                         |
+| 6    | Bethlehem Pk & Chesney Ln        | 655                         |
+| 7    | Bethlehem Pk & Chesney Ln        | 655                         |
+| 8    | Delaware Av & Wheatsheaf Ln      | 684                         |
+
 
     **The queries to #1 & #2 should generate results with a single row, with the following structure:**
 
@@ -190,6 +214,12 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     _Your query should run in under two minutes._
 
+| route_short_name | trip_headsign                    | shape_length |
+|-----------------|---------------------------------|--------------|
+| 130            | Bucks County Community College  | 46505        |
+| 128            | Oxford Valley Mall              | 43659        |
+
+
     >_**HINT**: The `ST_MakeLine` function is useful here. You can see an example of how you could use it at [this MobilityData walkthrough](https://docs.mobilitydb.com/MobilityDB-workshop/master/ch04.html#:~:text=INSERT%20INTO%20shape_geoms) on using GTFS data. If you find other good examples, please share them in Slack._
 
     >_**HINT**: Use the query planner (`EXPLAIN`) to see if there might be opportunities to speed up your query with indexes. For reference, I got this query to run in about 15 seconds._
@@ -214,11 +244,29 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     Discuss your accessibility metric and how you arrived at it below:
 
-    **Description:**
+    **Description:** I establish an accessibility metric according to three indicators: average stops per kilometer (for general stop density), accessible stop ratio, and average wheelchair boarding numbers per accessible stops. The final accessibility metric is the product of all three indicators.
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
+| neighborhood_name  | accessible_stops | inaccessible_stops | accessibility_metric |
+|--------------------|-----------------|--------------------|----------------------|
+| WOODLAND_TERRACE  | 10              | 0                 | 151.54               |
+| NEWBOLD           | 49              | 0                 | 97.22                |
+| WASHINGTON_SQUARE | 74              | 1                 | 89.43                |
+| CENTER_CITY       | 28              | 0                 | 84.04                |
+| SPRING_GARDEN     | 49              | 0                 | 81.04                |
+
+
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
+
+| neighborhood_name  | accessible_stops | inaccessible_stops | accessibility_metric |
+|--------------------|-----------------|--------------------|----------------------|
+| WEST_TORRESDALE   | 1               | 0                 | 1.85                 |
+| NAVY_YARD         | 14              | 0                 | 1.88                 |
+| AIRPORT           | 20              | 0                 | 2.14                 |
+| INDUSTRIAL        | 29              | 2                 | 2.66                 |
+| CRESTMONT_FARMS   | 1               | 0                 | 2.97                 |
+
 
     **Both #6 and #7 should have the structure:**
     ```sql
@@ -239,7 +287,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
-    **Discussion:**
+    **Discussion:** I used parcel and neighborhood dataset to define Penn's Campus. In the neighborhood dataset, I was able to filter the university city neighborhood. Since land owned by Penn usually begins with something like "UNIV" or "TRUSTEE" in the owner fields, I was able to use the parcel dataset to further filter and define Penn campus area. As a result, there are about **3 Census Blocks** contains in the area owned by University of Pennsylvania.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
@@ -249,6 +297,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
         geo_id text
     )
     ```
+The geoid Meyerson Hall locates in: 421010369022. 
 
 10. You're tasked with giving more contextual information to rail stops to fill the `stop_desc` field in a GTFS feed. Using any of the data sets above, PostGIS functions (e.g., `ST_Distance`, `ST_Azimuth`, etc.), and PostgreSQL string functions, build a description (alias as `stop_desc`) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible), and other methods of describing the relationships. SQL's `CASE` statements may be helpful for some operations.
 
