@@ -6,4 +6,4 @@ with ucity as (
 
 select count(*) as count_block_groups
 from census.blockgroups_2020 as bg
-inner join ucity on (st_dwithin(bg.geog, ucity.geog, 5));
+inner join ucity on (st_within(bg.geog::geometry, ucity.geog::geometry));
