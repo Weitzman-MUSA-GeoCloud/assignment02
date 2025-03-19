@@ -3,6 +3,7 @@ with protected as (
     from phl.bike_network
     where type like '%Separated Bike Lane%'
 ),
+
 info as (
     select
         rail.stop_id,
@@ -25,7 +26,8 @@ info as (
             limit 1
         ) as bike
 )
-select 
+
+select
     stop_id,
     stop_name,
     stop_desc,

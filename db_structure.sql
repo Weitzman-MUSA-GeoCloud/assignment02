@@ -37,6 +37,12 @@ add column if not exists geog geography;
 update septa.bus_stops
 set geog = st_makepoint(stop_lon, stop_lat)::geography;
 
+alter table septa.rail_stops
+add column if not exists geog geography;
+
+update septa.rail_stops
+set geog = st_makepoint(stop_lon, stop_lat)::geography;
+
 
 -- Create an index on the geog column.
 create index septa_bus_stops_geog_idx
@@ -49,4 +55,8 @@ on phl.neighborhoods using gist
 
 create index parcel_geog_idx
 on phl.pwd_parcels using gist
+(geog);
+
+create index bike_geog_idx
+on phl.bike_network using gist
 (geog);

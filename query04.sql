@@ -15,6 +15,7 @@ shapes as (
     from septa.bus_shapes
     group by shape_id
 ),
+
 distinct_trips as (
     select distinct
         trip_headsign,
@@ -22,6 +23,7 @@ distinct_trips as (
         shape_id
     from septa.bus_trips
 ),
+
 trip_shapes as (
     select
         trips.route_id,
@@ -32,6 +34,7 @@ trip_shapes as (
     from distinct_trips as trips
     inner join shapes using (shape_id)
 ),
+
 longest_trips_per_route as (
     select
         route_id,
@@ -39,13 +42,15 @@ longest_trips_per_route as (
     from trip_shapes
     group by route_id
 ),
+
 longest_2_trips as (
     select *
     from longest_trips_per_route
     order by shape_length desc
     limit 2
 )
-select 
+
+select
     routes.route_short_name,
     trip_shapes.trip_headsign,
     trip_shapes.shape_geog,
