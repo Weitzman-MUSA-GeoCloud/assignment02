@@ -214,7 +214,12 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     Discuss your accessibility metric and how you arrived at it below:
 
-    **Description:**
+    **Description:** The accessibility metric I chose is the density of wheelchair-accessible bus stops for each neighborhood in Philadelphia. This metric is calculated by dividing the total number of wheelchair-accessible bus stops in a neighborhood by its total area in square kilometers. The specific implementation steps are as follows:
+    1. I first extracted the stop_id and wheelchair_boarding columns from the septa.bus_stops table to obtain the wheelchair accessibility information for parent stations.
+    2. According to the GTFS documentation, if a bus stop's wheelchair_boarding value is 0 or NULL (indicating "No accessibility information for the stop") but it has a parent station (parent_station IS NOT NULL), it inherits its wheelchair accessibility status from the parent station.
+    3. Based on this rule, bus stops with a parent station inherit their wheelchair accessibility information from the dataset extracted in the first step.
+    4. I then calculated the number of wheelchair-accessible bus stops (wheelchair_boarding = 1) and non-accessible bus stops (wheelchair_boarding = 2) within each neighborhood, as well as the total area of each neighborhood (converted into square kilometers). Stops that did not provide accessibility information (wheelchair_boarding = 0 or empty) were excluded from this calculation.
+    5. Finally, I calculated and ranked the density of wheelchair-accessible bus stops per square kilometer for each neighborhood.
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
@@ -239,9 +244,13 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
-    **Discussion:**
+    **Discussion:** I defined Penn's main campus using both phl.neighborhoods and phl.pwd_parcels.
+    1. I first selected parcels from phl.pwd_parcels whose ownership records contain both "univ" and "penn" (case-insensitive).
+    2. From the selected parcels, I retained only those intersecting the University City neighborhood in phl.neighborhoods, considering them as part of Penn's main campus.
+    3. I constructed a convex hull from the selected parcels to approximate Penn's campus boundary.
+    4. For each census block group, I calculated the percentage of its area that falls within the defined campus boundary. Since the convex hull is a rough approximation, any census block group with at least 90% of its area inside the boundary is considered fully contained in Penn's main campus.
 
-9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
+9.  With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
     **Structure (should be a single value):**
     ```sql
