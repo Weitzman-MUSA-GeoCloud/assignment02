@@ -214,7 +214,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     Discuss your accessibility metric and how you arrived at it below:
 
-    **Description:**
+    **Description:** I calculated the distances between the centroid of each neighborhood and its five nearest bus stops. Since each bus stop has its wheelchair boarding situation, I divided the wheelchair score by distance as a weighted accessibility and normalized it to a 10-point scale for better interpretation.
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
@@ -239,7 +239,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
-    **Discussion:**
+    **Discussion:** I chose Penn Patrol Zone as the boundary of Penn's main campus, and used the boundary with 100m buffer to count the number of block groups within (thanks to Byron).
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
@@ -262,6 +262,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
         stop_lat double precision
     )
     ```
+    **Annotation**: I used [Septa Regional Rail Lines](https://hub.arcgis.com/datasets/7ebff6bc356d4fa28d4a7e4147d03b32_0/explore?location=40.116993%2C-75.068112%2C9.84) additionally for the field.
 
    As an example, your `stop_desc` for a station stop may be something like "37 meters NE of 1234 Market St" (that's only an example, feel free to be creative, silly, descriptive, etc.)
 
