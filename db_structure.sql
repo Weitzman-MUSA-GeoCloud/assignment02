@@ -31,11 +31,12 @@ running the following command from the command line:
 */
 
 -- Add a column to the septa.bus_stops table to store the geometry of each stop.
+
 alter table septa.bus_stops
-add column if not exists geog geography;
+add column if not exists geog public.geography;
 
 update septa.bus_stops
-set geog = st_makepoint(stop_lon, stop_lat)::geography;
+set geog = public.st_makepoint(stop_lon::float, stop_lat::float)::public.geography;
 
 -- Create an index on the geog column.
 create index if not exists septa_bus_stops__geog__idx
