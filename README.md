@@ -159,6 +159,8 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
 1.  Which **eight** bus stop have the largest population within 800 meters? As a rough estimation, consider any block group that intersects the buffer as being part of the 800 meter buffer.
 
+The eight bus stops with the largest estimated population within an 800-meter buffer are primarily located in the Rittenhouse Square and South Philadelphia areas. The bus stop at Lombard St & 18th St has the highest estimated nearby population at approximately 57,936 people, followed closely by stops at Rittenhouse Sq & 18th St (57,571) and Snyder Av & 9th St (57,412). Other highly populated stops include locations along Lombard Street, Locust Street, and South Street. These findings highlight that some of the densest residential and mixed-use neighborhoods in Philadelphia are within walking distance of these key transit stops.
+
 2.  Which **eight** bus stops have the smallest population above 500 people _inside of Philadelphia_ within 800 meters of the stop (Philadelphia county block groups have a geoid prefix of `42101` -- that's `42` for the state of PA, and `101` for Philadelphia county)?
 
     **The queries to #1 & #2 should generate results with a single row, with the following structure:**
@@ -170,6 +172,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
         geog geography -- The geography of the bus stop
     )
     ```
+Among bus stops located within Philadelphia, the eight stops with the smallest estimated population (above 500 people) within an 800-meter buffer are primarily along Delaware Avenue, Bethlehem Pike, and in the northwest areas of the city. The stops at Delaware Av & Tioga St, Delaware Av & Venango St, and Delaware Av & Castor Av each have an estimated nearby population of approximately 593 residents, the lowest among the results. Other stops like Northwestern Av & Stenton Av and Bethlehem Pk & Chesney Ln also have relatively low nearby populations, ranging from 655 to 729 people. These stops are located near more industrial or lower-density residential zones within Philadelphia.
 
 3.  Using the Philadelphia Water Department Stormwater Billing Parcels dataset, pair each parcel with its closest bus stop. The final result should give the parcel address, bus stop name, and distance apart in meters, rounded to two decimals. Order by distance (largest on top).
 
@@ -185,6 +188,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
         distance numeric  -- The distance apart in meters, rounded to two decimals
     )
     ```
+Each parcel was matched to its nearest SEPTA bus stop using a spatial nearest neighbor query. The results include the parcel address, closest stop name, and distance in meters rounded to two decimals. Distances were ordered from largest to smallest to highlight parcels farther from transit access.
 
 4.  Using the `bus_shapes`, `bus_routes`, and `bus_trips` tables from GTFS bus feed, find the **two** routes with the longest trips.
 
@@ -208,6 +212,8 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
+Using SEPTA’s GTFS data, the two longest bus trips were identified by constructing trip geometries from shape points and calculating their total distances. Both longest trips belong to Route 130 toward Bucks County Community College and have identical trip lengths.
+
 5.  Rate neighborhoods by their bus stop accessibility for wheelchairs. Use OpenDataPhilly's neighborhood dataset along with an appropriate dataset from the Septa GTFS bus feed. Use the [GTFS documentation](https://gtfs.org/reference/static/) for help. Use some creativity in the metric you devise in rating neighborhoods.
 
     _NOTE: There is no automated test for this question, as there's no one right answer. With urban data analysis, this is frequently the case._
@@ -215,8 +221,13 @@ There are several datasets that are prescribed for you to use in this part. Belo
     Discuss your accessibility metric and how you arrived at it below:
 
     **Description:**
+Neighborhoods were ranked by the percentage of bus stops that are wheelchair accessible. The analysis showed significant variation, with some neighborhoods having a much higher share of accessible stops than others. This highlights areas where public transit is more inclusive, as well as neighborhoods that may benefit from future accessibility improvements.
+
+I calculated the accessibility metric as the percentage of bus stops within each neighborhood that are marked as wheelchair accessible (wheelchair_boarding = 1) in the GTFS bus stop dataset. Bus stops marked as not accessible (wheelchair_boarding = 2) or with missing information were counted separately. The final metric is the number of accessible stops divided by the total number of bus stops in the neighborhood, multiplied by 100 to express it as a percentage. This approach captures how easy it is for individuals who use wheelchairs to access public transit in different neighborhoods.
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
+
+The top five neighborhoods with the highest accessibility metrics are Upper Roxborough, West Central Germantown, Winchester Park, Normandy Village, and Ogontz. These neighborhoods have the highest shares of wheelchair-accessible bus stops in Philadelphia, indicating strong public transit accessibility for individuals with mobility needs. Their high accessibility scores highlight areas where inclusive transit infrastructure is most effectively provided.
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
 
@@ -229,6 +240,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
       num_bus_stops_inaccessible integer
     )
     ```
+The top five neighborhoods with the lowest accessibility metrics are Bartram Village (0%), Woodland Terrace (20%), Southwest Schuylkill (44.23%), Paschall (44.93%), and Cedar Park (50%). These results highlight areas where public transit infrastructure is less accessible for individuals with mobility needs, indicating potential priorities for future accessibility improvements.
 
 8.  With a query, find out how many census block groups Penn's main campus fully contains. Discuss which dataset you chose for defining Penn's campus.
 
@@ -239,7 +251,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
-    **Discussion:**
+    **Discussion:** The query found that Penn's main campus, approximated using the University City neighborhood boundary, fully contains 11 Census Block Groups. This was determined by selecting block groups completely within the neighborhood polygon using PostGIS spatial functions. The result provides a spatial estimate of how many block groups the campus covers based on available open data.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
@@ -249,6 +261,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
         geo_id text
     )
     ```
+Since a specific parcel for Meyerson Hall could not be found in the Philadelphia Water Department Parcels dataset, I approximated its location using the University City neighborhood boundary. I identified the block group closest to the center of University City, which corresponds to the area around 34th and Walnut Streets where Meyerson Hall is located. This approach is appropriate given the limitations of the available public parcel data.
 
 10. You're tasked with giving more contextual information to rail stops to fill the `stop_desc` field in a GTFS feed. Using any of the data sets above, PostGIS functions (e.g., `ST_Distance`, `ST_Azimuth`, etc.), and PostgreSQL string functions, build a description (alias as `stop_desc`) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible), and other methods of describing the relationships. SQL's `CASE` statements may be helpful for some operations.
 
@@ -266,3 +279,5 @@ There are several datasets that are prescribed for you to use in this part. Belo
    As an example, your `stop_desc` for a station stop may be something like "37 meters NE of 1234 Market St" (that's only an example, feel free to be creative, silly, descriptive, etc.)
 
    >**Tip when experimenting:** Use subqueries to limit your query to just a few rows to keep query times faster. Once your query is giving you answers you want, scale it up. E.g., instead of `FROM tablename`, use `FROM (SELECT * FROM tablename limit 10) as t`.
+
+For each rail stop, I built a stop_desc by finding the nearest PWD parcel address and calculating the distance and azimuth direction between the stop and the parcel’s centroid. Using PostGIS functions (ST_Distance, ST_Azimuth, ST_Centroid) and string functions, I generated descriptions like "87 meters E of 3600 Walnut St" to provide spatial context for riders.
