@@ -8,28 +8,29 @@
 -- 2. 420 Rex Ave (798.31 m)
 -- 3. 434 W Chestnut Hill Ave (796.44 m)
 
-CREATE INDEX IF NOT EXISTS idx_pwd_parcels_geog ON phl.pwd_parcels USING gist(geog);
-CREATE INDEX IF NOT EXISTS idx_bus_stops_geog ON septa.bus_stops USING gist(geog);
+CREATE INDEX IF NOT EXISTS idx_pwd_parcels_geog ON phl.pwd_parcels USING gist (geog);
+CREATE INDEX IF NOT EXISTS idx_bus_stops_geog ON septa.bus_stops USING gist (geog);
 
-SELECT 
-    p.address AS parcel_address, 
-    b.stop_name AS stop_name, 
+SELECT
+    p.address AS parcel_address,
+    b.stop_name,
     ROUND(public.ST_Distance(p.geog, b.geog)::numeric, 2) AS distance
-FROM 
-    phl.pwd_parcels p
-CROSS JOIN LATERAL (
-    SELECT 
-        b.stop_name, 
-        b.geog, 
-        b.stop_id, 
-        public.ST_Distance(p.geog, b.geog) AS dist  
-    FROM 
-        septa.bus_stops b
-    WHERE 
-        public.ST_DWithin(p.geog, b.geog, 800)  
-    ORDER BY 
-        dist  
-    LIMIT 1  
-) b
-ORDER BY 
+FROM
+    phl.pwd_parcels AS p
+CROSS JOIN
+    LATERAL (
+        SELECT
+            b.stop_name,
+            b.geog,
+            b.stop_id,
+            public.ST_Distance(p.geog, b.geog) AS dist
+        FROM
+            septa.bus_stops AS b
+        WHERE
+            public.ST_DWithin(p.geog, b.geog, 800)
+        ORDER BY
+            dist
+        LIMIT 1
+    ) AS b
+ORDER BY
     distance DESC;
