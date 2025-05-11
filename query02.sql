@@ -1,27 +1,22 @@
-/*
-  Which bus stop has the largest population within 800 meters? As a rough
-  estimation, consider any block group that intersects the buffer as being part
-  of the 800 meter buffer.
-*/
-
-WITH
-septa_bus_stop_blockgroups AS (
+WITH septa_bus_stop_blockgroups AS (
     SELECT
         stops.stop_id,
         '1500000US' || bg.geoid AS geoid
     FROM septa.bus_stops AS stops
     INNER JOIN census.blockgroups_2020 AS bg
-        ON public.st_dwithin(stops.geog, bg.geog, 800)
+        ON ST_DWITHIN(stops.geog, bg.geog, 800)
+    WHERE bg.geoid LIKE '42101%' -- Only Philadelphia County
 ),
 
 septa_bus_stop_surrounding_population AS (
     SELECT
-        stops.stop_id,
+        sb.stop_id,
         SUM(pop.total) AS estimated_pop_800m
-    FROM septa_bus_stop_blockgroups AS stops
+    FROM septa_bus_stop_blockgroups AS sb
     INNER JOIN census.population_2020 AS pop
-        USING (geoid)
-    GROUP BY stops.stop_id
+        ON sb.geoid = pop.geoid
+    GROUP BY sb.stop_id
+    HAVING SUM(pop.total) > 500
 )
 
 SELECT
@@ -30,6 +25,6 @@ SELECT
     stops.geog
 FROM septa_bus_stop_surrounding_population AS pop
 INNER JOIN septa.bus_stops AS stops
-    USING (stop_id)
-ORDER BY pop.estimated_pop_800m DESC
+    ON pop.stop_id = stops.stop_id
+ORDER BY pop.estimated_pop_800m ASC
 LIMIT 8;
