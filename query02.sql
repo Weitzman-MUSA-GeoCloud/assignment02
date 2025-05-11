@@ -1,18 +1,17 @@
--- Active: 1742525234643@@localhost@5432@macysdata
--- Query 1
+-- Query 2
 
--- Which eight bus stop have the largest population within 800 meters? As a rough estimation, 
--- consider any block group that intersects the buffer as being part of the 800 meter buffer.
+-- Which eight bus stops have the smallest population above 500 people inside of Philadelphia within 800 meters of the stop 
+-- (Philadelphia county block groups have a geoid prefix of 42101 -- that's 42 for the state of PA, and 101 for Philadelphia county)?
 
--- Answer:
--- 1. Lombard St & 18th St
--- 2. Rittenhouse Sq & 18th St
--- 3. Snyder Av & 19th St
--- 4. Lombard St & 19th St
--- 5. 16th & Locust St
--- 6. South St & 19th St
--- 7. 17th St & Lombard St
--- 8. Walnut St & 16th St
+-- ANSWER:
+-- 1. Delaware Av & Tioga St
+-- 2. Delaware Av & Castor Av
+-- 3. Delaware Av & Venango St
+-- 4. Delaware Av & Wheatsheaf Ln
+-- 5. Valley Forge Park Dr & Washington Memorial Chapel
+-- 6. Southhampton Rd & Roosevelt - MBNS
+-- 7. Southhampton Rd & Hank Salvatore Rd
+-- 8. Charter Rd & Norcom Rd - FS
 
 WITH
 
@@ -32,6 +31,7 @@ septa_bus_stop_surrounding_population AS (
     FROM septa_bus_stop_blockgroups AS stops
     INNER JOIN census.population_2020 AS pop USING (geoid)
     GROUP BY stops.stop_id
+    HAVING sum(pop.total) > 500
 )
 
 SELECT
@@ -40,5 +40,5 @@ SELECT
     stops.geog
 FROM septa_bus_stop_surrounding_population AS pop
 INNER JOIN septa.bus_stops AS stops USING (stop_id)
-ORDER BY pop.estimated_pop_800m DESC
-LIMIT 10
+ORDER BY pop.estimated_pop_800m ASC
+LIMIT 9
