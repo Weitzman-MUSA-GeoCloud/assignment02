@@ -1,5 +1,5 @@
 /*
-This query focuses on areas identified as University City within the 2020 census block group data. 
+query focuses on areas identified as University City within the 2020 census block group data. 
 It examines the spatial relationship between census block groups and the University City neighborhood.
 */
 
