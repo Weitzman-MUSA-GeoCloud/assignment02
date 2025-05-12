@@ -1,16 +1,16 @@
-/*
-This query focuses on areas identified as University City within the 2020 census block group data. 
-It examines the spatial relationship between census block groups and the University City neighborhood.
-*/
+/*With a query involving PWD parcels and census block groups, find the geo_id of the block group that contains Meyerson Hall. 
+ST_MakePoint() and functions like that are not allowed.*/
 
-WITH university_city AS (
-    SELECT geog
-    FROM phl.neighborhoods
-    WHERE listname = 'University City'
-)
-SELECT count(*) AS count_block_groups
-FROM census.blockgroups_2020 AS bg
-INNER JOIN university_city ON (
-    public.st_within(bg.geog::public.geometry, university_city.geog::public.geometry)
+/* ANSWER: GEOID 421010369021 */
+
+SELECT blockgroups.geoid AS geo_id
+FROM census.blockgroups_2020 AS blockgroups
+INNER JOIN phl.pwd_parcels AS pp
+    ON public.ST_Intersects(
+        pp.geog::public.geometry, public.ST_GeomFromText(
+            'POINT(-75.192711 39.952208)', 4326
+        )
+    )
+WHERE public.ST_Contains(
+    blockgroups.geog::public.geometry, pp.geog::public.geometry
 );
-
