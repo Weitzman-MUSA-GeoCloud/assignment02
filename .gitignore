@@ -2,3 +2,10 @@ node_modules/
 __data__/
 __pgdata__/
 .env
+Data/PWD_PARCELS/
+Data/PWD_PARCELS/PWD_PARCELS.cpg
+Data/PWD_PARCELS/PWD_PARCELS.dbf
+Data/PWD_PARCELS/PWD_PARCELS.prj
+Data/PWD_PARCELS/PWD_PARCELS.shp
+Data/PWD_PARCELS/PWD_PARCELS.shx
+Data/PWD_PARCELS/PWD_PARCELS.xml

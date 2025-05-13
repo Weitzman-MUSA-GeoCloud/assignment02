@@ -214,6 +214,12 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     Discuss your accessibility metric and how you arrived at it below:
 
+    I used the wheelchair_boarding variable in septa.bus_stops as well as the number of bus stops per neighborhood to create an accessibility metric. This metric evaluates neighborhoods based on the density of accessible stops (number of accessible stops) and proportion of accessible stops (percentage of bus stops in the neighborhood that accessible). This means neighborhoods with many accessible stops in a small area are considered more accessible as it is easier for wheelchair users to not only travel to reach a stop but to also use the stop. It takes a conservative approach where if there is no accessibility information available on the stop (wheelchair_boarding = 0), it is assumed that the stop is naccessible.
+
+
+
+The final score is calculated as:
+
     **Description:**
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
@@ -240,6 +246,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+    The names of the owner in the PWD parcels was used, where names involving the University of Pennsylvania were extracted. The coordinate reference system was trasnformed to EPSG:2272, the Pennsylvania State Plane projection, for a more accurate area comparison between the parcels and the block groups.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
