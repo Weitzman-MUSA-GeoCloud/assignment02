@@ -25,6 +25,7 @@ WITH nearest_parcel AS (
         LIMIT 1
     ) AS p ON TRUE
 ),
+
 bus_counts AS (
     SELECT
         rs.stop_id,
