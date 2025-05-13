@@ -1,11 +1,16 @@
 /*
-  Which bus stop has the largest population within 800 meters? As a rough
-  estimation, consider any block group that intersects the buffer as being part
-  of the 800 meter buffer.
-
-  Answer: Lombard St & 18th St
+  Which eight bus stops have the smallest population above 500 people inside of Philadelphia
+  within 800 meters of the stop (Philadelphia county block groups have a geoid prefix of 42101)?
+  Answer:
+	"Delaware Av & Tioga St"
+    "Delaware Av & Castor Av"
+    "Delaware Av & Venango St"
+    "Stenton Av & Northwestern Av"
+    "Northwestern Av & Stenton Av"
+    "Bethlehem Pk & Chesney Ln"
+    "Bethlehem Pk & Chesney Ln"
+    "Delaware Av & Wheatsheaf Ln"
 */
-
 
 with
 
@@ -15,7 +20,8 @@ septa_bus_stop_blockgroups as (
         '1500000US' || bg.geoid as geoid
     from septa.bus_stops as stops
     inner join census.blockgroups_2020 as bg
-        on st_dwithin(stops.geog, bg.geog, 800)
+        on public.st_dwithin(stops.geog, bg.geog, 800)
+    where bg.geoid like '42101%'
 ),
 
 septa_bus_stop_surrounding_population as (
@@ -25,6 +31,7 @@ septa_bus_stop_surrounding_population as (
     from septa_bus_stop_blockgroups as stops
     inner join census.population_2020 as pop using (geoid)
     group by stops.stop_id
+    having sum(pop.total) > 500
 )
 
 select
@@ -33,5 +40,5 @@ select
     stops.geog
 from septa_bus_stop_surrounding_population as pop
 inner join septa.bus_stops as stops using (stop_id)
-order by pop.estimated_pop_800m desc
+order by pop.estimated_pop_800m asc, stops.geog asc
 limit 8
