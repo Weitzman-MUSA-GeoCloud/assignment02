@@ -19,4 +19,3 @@ INNER JOIN phl.policeboundary AS pp
         ST_TRANSFORM(pp.geog::geometry, 4326),
         ST_TRANSFORM(bg.geog::geometry, 4326)
     );
-    
