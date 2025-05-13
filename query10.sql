@@ -1,24 +1,26 @@
 /*
-You're tasked with giving more contextual information to rail stops to fill the stop_desc field in a GTFS feed. 
-Using any of the data sets above, PostGIS functions (e.g., ST_Distance, ST_Azimuth, etc.), and PostgreSQL string functions, 
-build a description (alias as stop_desc) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible), 
+You're tasked with giving more contextual information to rail stops to fill the stop_desc field in a GTFS feed.
+Using any of the data sets above, PostGIS functions (e.g., ST_Distance, ST_Azimuth, etc.), and PostgreSQL string functions,
+build a description (alias as stop_desc) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible),
 and other methods of describing the relationships. SQL's CASE statements may be helpful for some operations.
 */
 
 WITH nearest_parcel AS (
-  SELECT
-    r.stop_id,
-    r.stop_name,
-    r.stop_lon,
-    r.stop_lat,
-    r.geog AS stop_geog,
-    p.address AS nearest_address,
-    p.geog AS parcel_geog,
-    ST_Distance(r.geog, p.geog) AS dist_m
-  FROM septa.rail_stops AS r
-  JOIN LATERAL (
-    SELECT address, geog
-    FROM phl.pwd_parcels
+    SELECT
+        r.stop_id,
+        r.stop_name,
+        r.stop_lon,
+        r.stop_lat,
+        r.geog AS stop_geog,
+        p.address AS nearest_address,
+        p.geog AS parcel_geog,
+        ST_DISTANCE(r.geog, p.geog) AS dist_m
+    FROM septa.rail_stops AS r
+    INNER JOIN LATERAL (
+        SELECT 
+            p.address, 
+            p.geog
+        FROM phl.pwd_parcels AS p
     ORDER BY r.geog <-> geog
     LIMIT 1
   ) AS p ON TRUE

@@ -40,7 +40,7 @@ WITH neighborhood_stats AS (
         ST_AREA(n.geog::geometry)::numeric / 1e6 AS area_km2
     FROM phl.neighborhoods AS n
     LEFT JOIN septa.bus_stops AS s
-      ON ST_WITHIN(s.geog::geometry, n.geog::geometry)
+        ON ST_WITHIN(s.geog::geometry, n.geog::geometry)
     GROUP BY n.name, n.geog
 ),
 
@@ -60,8 +60,8 @@ normalized_density AS (
         density,
         accessibility_ratio,
         -- normalize density to a 0–1 scale across neighborhoods
-        (density - MIN(density) OVER()) 
-          / NULLIF(MAX(density) OVER() - MIN(density) OVER(), 0) 
+        (density - MIN(density) OVER ())
+        / NULLIF(MAX(density) OVER () - MIN(density) OVER (), 0)
         AS density_norm
     FROM metrics
 ),
@@ -73,7 +73,7 @@ composite_score AS (
         accessibility_ratio,
         density_norm,
         -- composite score: average of normalized density and accessibility ratio
-        (density_norm + accessibility_ratio) / 2.0 
+        (density_norm + accessibility_ratio) / 2.0
         AS wheelchair_access_score
     FROM normalized_density
 )

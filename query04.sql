@@ -8,8 +8,8 @@ WITH
 trip_shape AS (
     SELECT
         bs.shape_id,
-        ST_MakeLine(ARRAY_AGG(
-            ST_SetSRID(ST_MakePoint(bs.shape_pt_lon, bs.shape_pt_lat), 4326)
+        ST_MAKELINE(ARRAY_AGG(
+            ST_SETSRID(ST_MAKEPOINT(bs.shape_pt_lon, bs.shape_pt_lat), 4326)
             ORDER BY bs.shape_pt_sequence
         ))::GEOGRAPHY AS shape_geog
     FROM septa.bus_shapes AS bs
@@ -21,7 +21,7 @@ trip_length AS (
     SELECT
         ts.shape_id,
         ts.shape_geog,
-        ROUND(ST_Length(ts.shape_geog)::NUMERIC, 0) AS shape_length
+        ROUND(ST_LENGTH(ts.shape_geog)::NUMERIC, 0) AS shape_length
     FROM trip_shape AS ts
 ),
 

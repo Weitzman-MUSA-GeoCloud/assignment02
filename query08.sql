@@ -15,7 +15,8 @@ Dataset chosen: phl.policeboundary (UPenn Police patrol zone)
 SELECT COUNT(*) AS count_block_groups
 FROM census.blockgroups_2020 AS bg
 INNER JOIN phl.policeboundary AS pp
-  ON ST_Contains(
-       ST_Transform(pp.geog::geometry, 4326),
-       ST_Transform(bg.geog::geometry, 4326)
-     );
+    ON ST_CONTAINS(
+        ST_TRANSFORM(pp.geog::geometry, 4326),
+        ST_TRANSFORM(bg.geog::geometry, 4326)
+    );
+    
