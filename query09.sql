@@ -1,7 +1,5 @@
 /*With a query involving PWD parcels and census block groups, find the geo_id of the block group that contains Meyerson Hall. 
-ST_MakePoint() and functions like that are not allowed.*/
-
-/* ANSWER: GEOID 421010369021 */
+ST_MakePoint() and functions like that are not*/
 
 SELECT blockgroups.geoid AS geo_id
 FROM census.blockgroups_2020 AS blockgroups
