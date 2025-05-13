@@ -3,11 +3,13 @@
 This query calculates a relative metric designed for comparison purposes. 
 It evaluates the number of wheelchair-accessible stations per unit area of each neighborhood. 
 Essentially, it divides the count of accessible stations by the neighborhood's area. 
-While the resulting value is expected to be quite small, it facilitates straightforward comparisons between neighborhoods.
+It's likely to result in a small value for neighborhoods with smaller areas, it should still provide a straightforward comparisons between neighborhoods.
 */
+
 
 SET search_path TO assignment2;
 
+-- table to store the accessibility metrics
 CREATE TABLE assignment2.phlmetrics AS
 WITH resolved_stops AS (
     SELECT
@@ -37,7 +39,7 @@ neighbourhood_accessibility AS (
 )
 SELECT
     name AS neighbourhood_name,
-    num_bus_stop_accessible / neighbourhood_area * 10000 AS accessibility_metric,
+    COALESCE(num_bus_stop_accessible / NULLIF(neighbourhood_area, 0) * 10000, 0) AS accessibility_metric,
     num_bus_stop_accessible,
     num_bus_stop_inaccessible
 FROM
