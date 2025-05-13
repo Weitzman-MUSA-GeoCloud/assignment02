@@ -213,6 +213,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     _NOTE: There is no automated test for this question, as there's no one right answer. With urban data analysis, this is frequently the case._
 
     Discuss your accessibility metric and how you arrived at it below:
+    The accessibility metric I used was number of wheelchair accessible stops normalized by the area of the neighborhood.  I used a normalized count of wheelchair accessible stops so that larger neighborhoods are not automatically more accessible just because they have more stops.
 
     **Description:**
 
@@ -240,6 +241,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+    I used the Penn Police's patrol boundary.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
