@@ -18,6 +18,9 @@ create table septa.bus_stops (
     wheelchair_boarding INTEGER
 );
 
+copy septa.bus_stops (stop_id, stop_code, stop_name, stop_desc, stop_lat, stop_lon, zone_id, stop_url, location_type, parent_station, stop_timezone, wheelchair_boarding)
+from '/Users/emmawit/Downloads/gtfs_public-3/google_bus/stops.txt' delimiter ',' csv header;
+
 drop table if exists septa.bus_routes;
 
 create table septa.bus_routes (
@@ -31,7 +34,8 @@ create table septa.bus_routes (
     route_color TEXT,
     route_text_color TEXT
 );
-
+copy septa.bus_routes (route_id, agency_id, route_short_name, route_long_name, route_desc, route_type, route_url, route_color, route_text_color)
+from '/Users/emmawit/Downloads/gtfs_public-3/google_bus/routes.txt' delimiter ',' csv header;
 drop table if exists septa.bus_trips;
 create table septa.bus_trips (
     route_id TEXT,
@@ -46,6 +50,9 @@ create table septa.bus_trips (
     bikes_allowed INTEGER
 );
 
+copy septa.bus_trips (route_id, service_id, trip_id, trip_headsign, trip_short_name, direction_id, block_id, shape_id, wheelchair_accessible, bikes_allowed)
+from '/Users/emmawit/Downloads/gtfs_public-3/google_bus/trips.txt' delimiter ',' csv header;
+
 drop table if exists septa.bus_shapes;
 create table septa.bus_shapes (
     shape_id TEXT,
@@ -54,6 +61,9 @@ create table septa.bus_shapes (
     shape_pt_sequence INTEGER,
     shape_dist_traveled DOUBLE PRECISION
 );
+
+copy septa.bus_shapes (shape_id, shape_pt_lat, shape_pt_lon, shape_pt_sequence, shape_dist_traveled)
+from '/Users/emmawit/Downloads/gtfs_public-3/google_bus/shapes.txt' delimiter ',' csv header;
 
 drop table if exists septa.rail_stops;
 create table septa.rail_stops (
@@ -66,6 +76,9 @@ create table septa.rail_stops (
     stop_url TEXT
 );
 
+copy septa.rail_stops (stop_id, stop_name, stop_desc, stop_lat, stop_lon, zone_id, stop_url)
+from '/Users/emmawit/Downloads/gtfs_public-3/google_rail/stops.txt' delimiter ',' csv header;
+
 drop table if exists census.population_2020;
 create table census.population_2020 (
     geoid TEXT,
@@ -73,5 +86,13 @@ create table census.population_2020 (
     total INTEGER
 );
 
+copy census.population_2020 (geoid, geoname, total)
+from '/Users/emmawit/Downloads/census_data2.csv'
+delimiter ','
+csv header;
 
+DROP EXTENSION IF EXISTS postgis CASCADE;
 create extension if not exists postgis;
+
+
+SELECT * FROM pg_available_extensions WHERE name = 'postgis';
