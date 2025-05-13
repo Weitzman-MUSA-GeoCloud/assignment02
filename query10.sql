@@ -27,13 +27,14 @@ WITH nearest_parcel AS (
 ),
 bus_counts AS (
     SELECT
-       rs.stop_id,
-       COUNT(bs.stop_id) AS bus_within_250m
+        rs.stop_id,
+        COUNT(bs.stop_id) AS bus_within_250m
     FROM septa.rail_stops AS rs
     LEFT JOIN septa.bus_stops AS bs
-       ON ST_DWITHIN(rs.geog, bs.geog, 250)
+        ON ST_DWITHIN(rs.geog, bs.geog, 250)
     GROUP BY rs.stop_id
 )
+
 SELECT
     np.stop_id,
     np.stop_name,
@@ -41,7 +42,7 @@ SELECT
     np.stop_lat,
     CONCAT(
         ROUND(np.dist_m)::int, ' m from ', INITCAP(np.nearest_address),
-        '; ', COALESCE(bc.bus_within_250m,0), ' bus stops within 250 m'
+        '; ', COALESCE(bc.bus_within_250m, 0), ' bus stops within 250 m'
     ) AS stop_desc
 FROM nearest_parcel AS np
 LEFT JOIN bus_counts AS bc
