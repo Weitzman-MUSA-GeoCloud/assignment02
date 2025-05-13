@@ -5,8 +5,6 @@ Using any of the data sets above, PostGIS functions (e.g., ST_Distance, ST_Azimu
 build a description (alias as stop_desc) for each stop.
 */
 
-/*ANSWER: the top stop_desc value reads "882 meters E of LOGAN_SQUARE"*/
-
 
 SELECT
     rail.stop_id,
