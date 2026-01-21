@@ -1,4 +1,4 @@
-# Build a docker image and push it to the GitHub Container Registry (but only if the Dockerfile has changed)
+# Build a docker image and push it to the GitHub Container Registry (but only if the Containerfile has changed)
 # Based on the GitHub Actions documentation: https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images#publishing-images-to-github-packages
 name: Build Image for Linting and Testing
 
@@ -11,7 +11,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'Dockerfile'
+      - 'Containerfile'
       - '__scripts__/**'
       - '.github/workflows/build-image.yml'
 
@@ -43,7 +43,7 @@ jobs:
 
       # Docker on GH Actions is going to be unhappy if I use __pgdata__ as a volume name,
       # so I'm going to use a different name for the volume and then rename it, since the
-      # Dockerfile expects the folder to be named __pgdata__.
+      # Containerfile expects the folder to be named __pgdata__.
       - name: Populate the database
         run: __scripts__/refresh_pgdata_folder.sh && sudo chmod -R 777 __pgdata__
 
@@ -62,7 +62,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
+      # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Containerfile`. If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see [Usage](https://github.com/docker/build-push-action#usage) in the README of the `docker/build-push-action` repository.
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
       - name: Build and push Docker image
