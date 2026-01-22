@@ -167,9 +167,9 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     ```sql
     (
+        stop_id text, -- The ID of the station
         stop_name text, -- The name of the station
-        estimated_pop_800m integer, -- The population within 800 meters
-        geog geography -- The geography of the bus stop
+        estimated_pop_800m integer -- The population within 800 meters
     )
     ```
 
@@ -205,8 +205,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     (
         route_short_name text,  -- The short name of the route
         trip_headsign text,  -- Headsign of the trip
-        shape_geog geography,  -- The shape of the trip
-        shape_length numeric  -- Length of the trip in meters, rounded to the nearest whole number
+        shape_length numeric  -- Length of the trip in meters, rounded to the nearest meter
     )
     ```
 

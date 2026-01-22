@@ -22,7 +22,7 @@ if (envLoadResult.error) {
 // Get the current path
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-function indent(str, n=4, char=' ') {
+function indent(str, n = 4, char = ' ') {
   const prefix = char.repeat(n);
   return str.replace(/^/gm, prefix);  // Replace each beginning of a line with the spaces.
 }
@@ -72,7 +72,7 @@ async function toReturnRecords(queryFN, resultsFNs, options = {}) {
     const fullResultsFN = path.resolve(__dirname, resultsFN);
     try {
       const csv = await fs.readFile(fullResultsFN, { encoding: 'utf8', flag: 'r' });
-      const expected = Papa.parse(csv, { header: true });
+      const expected = Papa.parse(csv, { header: true, skipEmptyLines: true });
       expecteds.push(expected);
     } catch (err) {
       return {
@@ -108,9 +108,9 @@ async function toReturnRecords(queryFN, resultsFNs, options = {}) {
   // to be strings).
   received.rows.map((row) => {
     for (const key in row) {
-      if(!row[key]) {
-        if(row[key] != '0') { row[key] = 'NULL' }
-        else if(row[key] == '0') { row[key] = '0' }
+      if (!row[key]) {
+        if (row[key] != '0') { row[key] = 'NULL' }
+        else if (row[key] == '0') { row[key] = '0' }
       }
       else {
         row[key] = row[key].toString();
@@ -144,7 +144,6 @@ function areNumbersApproxEqual(a, b, epsilon = 0.000001) {
   const bNum = Number(b);
 
   if (Number.isNaN(aNum) || Number.isNaN(bNum)) {
-    console.log('Not a number:', a, b);
     return undefined;
   } else {
     return Math.abs(aNum - bNum) < epsilon;
