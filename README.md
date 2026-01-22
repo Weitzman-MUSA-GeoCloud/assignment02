@@ -1,5 +1,7 @@
 # Assignment 02
 
+**Complete by February 18, 2026**
+
 This assignment will work similarly to assignment #1. To complete this assigment you will need to do the following:
 1.  Fork this repository to your own account.
 2.  Clone your fork to your local machine.
