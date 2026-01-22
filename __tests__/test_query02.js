@@ -7,7 +7,7 @@ describe('Query 02', () => {
     await expect('../query02.sql')
       .toReturnRecords(
         ['expected_results/query02.csv'],
-        { orderBy: 'estimated_pop_800m, geog' },
+        { orderBy: 'estimated_pop_800m, stop_id' },
       );
   });
 });

@@ -6,8 +6,11 @@ describe('Query 01', () => {
   it('should return the correct results', async () => {
     await expect('../query01.sql')
       .toReturnRecords(
-        ['expected_results/query01.csv'],
-        { orderBy: 'estimated_pop_800m desc, geog desc' },
+        [
+          'expected_results/query01.csv',
+          'expected_results/query01_alt.csv',
+        ],
+        { orderBy: 'estimated_pop_800m desc, stop_id desc' },
       );
   });
 });
