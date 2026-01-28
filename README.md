@@ -217,6 +217,9 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
+I defined the accessibility metric as the density of wheelchair accessible bus stops within the neighborhood (Accessible Stops / Square Kilometer). This metric accounts for the varying sizes of neighborhoods; a large neighborhood might have many stops but still be hard to access if they are spread out, whereas a small neighborhood with a high density of accessible stops is more transit-friendly. I counted stops with `wheelchair_boarding = 1` as accessible.
+
+
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
@@ -241,6 +244,9 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+
+I used the `phl.neighborhoods` dataset and selected the 'UNIVERSITY_CITY' neighborhood to define Penn's campus. While Penn's campus is technically a subset of University City, parcel ownership data was inconsistent (various spellings for "Trustees of the University of Pennsylvania") and resulted in incomplete coverage. The 'UNIVERSITY_CITY' neighborhood provides a consistent polygon that encompasses the main campus area.
+
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
