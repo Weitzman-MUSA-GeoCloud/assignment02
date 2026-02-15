@@ -160,6 +160,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
 ## Questions
 
 1.  Which **eight** bus stop have the largest population within 800 meters? As a rough estimation, consider any block group that intersects the buffer as being part of the 800 meter buffer.
+Answer: Lombard St & 18th St, Rittenhouse Sq & 18th St, Snyder Av & 9th St, Lombard St & 19th St, 19th St & Lombard St, Locust St & 16th St, 16th St & Locust St, South St & 19th St
 
 2.  Which **eight** bus stops have the smallest population above 500 people _inside of Philadelphia_ within 800 meters of the stop (Philadelphia county block groups have a geoid prefix of `42101` -- that's `42` for the state of PA, and `101` for Philadelphia county)?
 
@@ -172,6 +173,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
         estimated_pop_800m integer -- The population within 800 meters
     )
     ```
+Answer: Delaware Av & Castor Av, Delaware Av & Tioga St, Delaware Av & Venango St, Northwestern Av & Stenton Av, Bethlehem Pk & Chesney Ln,Bethlehem Pk & Chesney Ln, Delaware Av & Wheatsheaf Ln, Long Ln & Lewis Av
 
 3.  Using the Philadelphia Water Department Stormwater Billing Parcels dataset, pair each parcel with its closest bus stop. The final result should give the parcel address, bus stop name, and distance apart in meters, rounded to two decimals. Order by distance (largest on top).
 
@@ -211,6 +213,10 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
+ANSWER: 
+130	Bucks County Community	46667.68
+124	13th-Market	44677.47
+
 5.  Rate neighborhoods by their bus stop accessibility for wheelchairs. Use OpenDataPhilly's neighborhood dataset along with an appropriate dataset from the Septa GTFS bus feed. Use the [GTFS documentation](https://gtfs.org/reference/static/) for help. Use some creativity in the metric you devise in rating neighborhoods.
 
     _NOTE: There is no automated test for this question, as there's no one right answer. With urban data analysis, this is frequently the case._
@@ -219,8 +225,20 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
-6.  What are the _top five_ neighborhoods according to your accessibility metric?
+To evaluate wheelchair bus accessibility across Philadelphia neighborhoods, I developed a composite accessibility score based on both the availability and concentration of wheelchair-accessible bus stops.
 
+First, I identified bus stops marked as wheelchair accessible (wheelchair_boarding = 1) in the SEPTA GTFS dataset. These stops were spatially joined to neighborhood boundaries using a spatial containment relationship. For each neighborhood, I calculated: (1) the total number of bus stops, (2) the number of wheelchair-accessible stops, and (3) the land area in square kilometers.
+
+Two key measures were derived. The first is the density of wheelchair-accessible stops (accessible stops per square kilometer), which captures spatial coverage. The second is the share of accessible stops relative to all stops in the neighborhood, which captures service quality. The final accessibility score is defined as:
+
+Accessibility Score = Accessible Stop Density × Share of Accessible Stops
+
+6.  What are the _top five_ neighborhoods according to your accessibility metric?
+NEWBOLD	84.523
+WASHINGTON_SQUARE	83.606
+HAWTHORNE	76.016
+FRANCISVILLE	74.876
+SPRING_GARDEN	73.224
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
 
     **Both #6 and #7 should have the structure:**
@@ -232,6 +250,11 @@ There are several datasets that are prescribed for you to use in this part. Belo
       num_bus_stops_inaccessible integer
     )
     ```
+BARTRAM_VILLAGE	0.000
+WEST_TORRESDALE	1.849
+NAVY_YARD	1.879
+AIRPORT	2.142
+INDUSTRIAL	2.841
 
 8.  With a query, find out how many census block groups Penn's main campus fully contains. Discuss which dataset you chose for defining Penn's campus.
 
@@ -244,6 +267,10 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Discussion:**
 
+To determine how many census block groups are fully contained within Penn’s main campus, I first defined the campus boundary using the City of Philadelphia PWD parcels dataset. I selected parcels whose ownership fields (owner1 or owner2) indicated the University of Pennsylvania (using keyword matching for “UNIV” and “PENN”), and then dissolved those parcels into a single geometry using ST_UnaryUnion. I chose the PWD parcels dataset because it represents legally recorded land ownership and provides a precise, spatially explicit footprint that can be reproducibly queried in SQL. 
+
+Using ST_CoveredBy to test whether census block groups (2020 TIGER/Line dataset) are fully contained within the dissolved campus geometry, I found that zero block groups are entirely contained within Penn’s campus. Although 25 block groups intersect the campus footprint, block group boundaries extend beyond the university-owned parcels. Additionally, the dissolved parcel geometry is fragmented due to roads and non-Penn parcels embedded within the campus area, making full containment unlikely.
+
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
     **Structure (should be a single value):**
@@ -252,6 +279,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
         geo_id text
     )
     ```
+Answer: 421010369022
 
 10. You're tasked with giving more contextual information to rail stops to fill the `stop_desc` field in a GTFS feed. Using any of the data sets above, PostGIS functions (e.g., `ST_Distance`, `ST_Azimuth`, etc.), and PostgreSQL string functions, build a description (alias as `stop_desc`) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible), and other methods of describing the relationships. SQL's `CASE` statements may be helpful for some operations.
 
