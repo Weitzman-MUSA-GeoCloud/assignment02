@@ -216,10 +216,23 @@ There are several datasets that are prescribed for you to use in this part. Belo
     Discuss your accessibility metric and how you arrived at it below:
 
     **Description:**
+    metric used is the raw count of wheelchair-accessible bus stops within each neighborhood, based on the wheelchair_boarding field in the SEPTA GTFS stops.txt data. According to the GTFS specification, a value of 1 indicates that the stop is accessible for wheelchair boarding, while a value of 2 indicates it is not accessible.
+    Each bus stop is spatially joined to its corresponding neighborhood using ST_Intersects, and stops are aggregated by neighborhood. Neighborhoods are then ranked in descending order by the number of accessible stops (wheelchair_boarding = 1).
+    This metric provides a straightforward measure of absolute accessibility coverage — neighborhoods with more accessible stops are considered more wheelchair-friendly. A limitation of this approach is that it does not account for neighborhood size or total stop count, meaning larger neighborhoods may naturally rank higher simply due to having more stops overall. A future improvement could normalize this by computing the ratio of accessible stops to total stops per neighborhood.
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
+    OVERBROOK
+    OLNEY
+    SOMERTON
+    BUSTLETON
+    OXFORD_CIRCLE
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
+    BARTRAM_VILLAGE
+    MECHANICSVILLE
+    CRESTMONT_FARMS
+    WEST_TORRESDALE
+    WOODLAND_TERRACE
 
     **Both #6 and #7 should have the structure:**
     ```sql
@@ -241,6 +254,15 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+    Dataset: OpenStreetMap (OSM) - University of Pennsylvania Campus Boundary
+    The campus boundary was obtained from OpenStreetMap using a Python script
+    that queries the Overpass API, filtering for the relation/way tagged with
+    name="University of Pennsylvania". The result was exported as GeoJSON and
+    loaded into the phl.penn_campus table using ogr2ogr (GEOGRAPHY type, EPSG:4326).
+    OSM was chosen because it provides a comprehensive, community-maintained
+    boundary of Penn's main campus that closely reflects the actual physical
+    extent of the university grounds, as opposed to individual parcel data
+    which may not capture the campus as a unified whole.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
