@@ -5,18 +5,17 @@
   decimals. Order by distance (largest on top).
 */
 
-
-SELECT
-    parcels.address AS parcel_address,
+select
+    parcels.address as parcel_address,
     stops.stop_name,
-    ROUND(ST_DISTANCE(parcels.geog, stops.geog)::numeric, 2) AS distance
-FROM phl.pwd_parcels AS parcels
-CROSS JOIN LATERAL (
-    SELECT
+    round(st_distance(parcels.geog, stops.geog)::numeric, 2) as distance
+from phl.pwd_parcels as parcels
+cross join lateral (
+    select
         bus_stops.stop_name,
         bus_stops.geog
-    FROM septa.bus_stops AS bus_stops
-    ORDER BY ST_DISTANCE(parcels.geog, bus_stops.geog)
-    LIMIT 1
-) AS stops
-ORDER BY distance DESC;
+    from septa.bus_stops as bus_stops
+    order by parcels.geog <-> bus_stops.geog
+    limit 1
+) as stops
+order by distance desc
