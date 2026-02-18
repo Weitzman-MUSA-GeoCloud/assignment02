@@ -108,15 +108,32 @@ with open(
 ) as infile:
     data = json.load(infile)
 
+print(f"Total rows in JSON: {len(data)}")
+print(f"First row (header): {data[0]}")
+print(f"Second row (sample data): {data[1] if len(data) > 1 else 'N/A'}")
+
 with open(
     PROCESSED_DATA_DIR / 'census_population_2020.csv',
     'w', encoding='utf-8',
+    newline='',  # Important for CSV on Windows
 ) as outfile:
-    writer = csv.writer(outfile)
-    writer.writerows([
-        (row[1], row[0], row[2])
-        for row in data
-    ])
+    # Use QUOTE_ALL to quote all fields (handles commas in data)
+    writer = csv.writer(outfile, quoting=csv.QUOTE_ALL)
+    # Write header row - column names MUST match table definition
+    # JSON structure: [NAME, GEO_ID, P1_001N, state, county, tract, block group]
+    # We want: geoname (from NAME), geo_id (from GEO_ID), population (from P1_001N)
+    writer.writerow(['geoname', 'geo_id', 'population'])
+    
+    # Write data rows, skip first row (it's the header in JSON)
+    valid_rows = 0
+    for row in data[1:]:  # Skip first row (header)
+        # Check we have at least 3 elements and they're not empty
+        if len(row) >= 3 and row[0] and row[1] and row[2]:
+            # Write in order: NAME, GEO_ID, P1_001N
+            writer.writerow((row[0], row[1], row[2]))
+            valid_rows += 1
+    
+    print(f"Written {valid_rows} valid data rows to CSV")
 EOF
 
 # load data into database
@@ -131,17 +148,7 @@ if [ ! -f ${DATADIR}/phl_pwd_parcels.zip ]; then
 fi
 unzip -o ${DATADIR}/phl_pwd_parcels.zip -d ${DATADIR}/phl_pwd_parcels
 
-# load parcel data into database
-ogr2ogr \
-    -f "PostgreSQL" \
-    PG:"${POSTGRES_CONNSTRING}" \
-    -nln phl.pwd_parcels \
-    -nlt MULTIPOLYGON \
-    -t_srs EPSG:4326 \
-    -lco GEOMETRY_NAME=geog \
-    -lco GEOM_TYPE=GEOGRAPHY \
-    -overwrite \
-    "${DATADIR}/phl_pwd_parcels/PWD_PARCELS.shp"
+
 
 
 # Download philly neighborhood data
@@ -151,15 +158,7 @@ if [ ! -f ${DATADIR}/Neighborhoods_Philadelphia.geojson ]; then
 fi
 
 # load neighbourhoods data into database
-ogr2ogr \
-    -f "PostgreSQL" \
-    PG:"${POSTGRES_CONNSTRING}" \
-    -nln phl.neighborhoods \
-    -nlt MULTIPOLYGON \
-    -lco GEOMETRY_NAME=geog \
-    -lco GEOM_TYPE=GEOGRAPHY \
-    -overwrite \
-    "${DATADIR}/Neighborhoods_Philadelphia.geojson"
+
 
 # Download and unzip census data
 if [ ! -f ${DATADIR}/census_blockgroups_2020.zip ]; then
