@@ -3,13 +3,6 @@ Using the Philadelphia Water Department Stormwater Billing Parcels dataset, pair
 */
 
 
-CREATE INDEX if NOT EXISTS pwd_parcels_geog_gist
-    ON phl.pwd_parcels
-    USING gist (geog);
-
-CREATE INDEX IF NOT EXISTS bus_stops_geog_gist
-    ON septa.bus_stops
-    USING gist (geog);
 
 set search_path = public；
 

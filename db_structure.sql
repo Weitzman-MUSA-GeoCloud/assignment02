@@ -125,3 +125,19 @@ on septa.bus_stops using gist
 (geog);
 
 
+CREATE INDEX if NOT EXISTS pwd_parcels_geog_gist
+    ON phl.pwd_parcels
+    USING gist (geog);
+
+CREATE INDEX IF NOT EXISTS bus_stops_geog_gist
+    ON septa.bus_stops
+    USING gist (geog);
+
+create index if not exists bus_shapes_shape_seq_idx
+    on septa.bus_shapes (shape_id, shape_pt_sequence);
+
+create index if not exists bus_trips_shape_idx
+    ON septa.bus_trips (shape_id);
+
+create index if not exists bus_trips_route_idx 
+    on septa.bus_trips(route_id);    
