@@ -218,7 +218,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     Discuss your accessibility metric and how you arrived at it below:
 
     **Description:**
-
+My accessibility metric is the ratio of wheelchair-accessible bus stops to total bus stops in each neighborhood. Using the GTFS wheelchair_boarding field (value 1 = accessible), I calculate num_accessible / total_stops per neighborhood. A score of 1.00 means all stops are accessible; 0.00 means none are.
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
@@ -243,7 +243,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
-
+I used the phl.neighborhoods dataset from OpenDataPhilly, specifically the UNIVERSITY_CITY neighborhood polygon, as a proxy for Penn's main campus. Using ST_Covers, I found 11 census block groups fully contained within this boundary.
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
     **Structure (should be a single value):**

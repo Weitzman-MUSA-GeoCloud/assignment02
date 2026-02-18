@@ -11,6 +11,8 @@ inner join census.blockgroups_2020 as bg
     )
 inner join census.population_2020 as pop
     on bg.geoid = pop.geoid
+where bg.geoid like '42101%'
 group by stops.stop_id, stops.stop_name
-order by estimated_pop_800m desc
+having sum(pop.total) > 500
+order by estimated_pop_800m asc
 limit 8
