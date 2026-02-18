@@ -12,13 +12,13 @@ trip_shapes as (
         shapes.shape_id,
         st_makeline(
             st_point(shapes.shape_pt_lon, shapes.shape_pt_lat)
-            order by shapes.shape_pt_sequence
-        )::geography as shape_geog
-    from septa.bus_trips as trips
-    inner join septa.bus_shapes as shapes
+        order by shapes.shape_pt_sequence
+            )::geography as shape_geog
+            from septa.bus_trips as trips
+        inner join septa.bus_shapes as shapes
         on trips.shape_id = shapes.shape_id
-    group by trips.route_id, trips.trip_headsign, shapes.shape_id
-),
+        group by trips.route_id, trips.trip_headsign, shapes.shape_id
+    ),
 
 shape_lengths as (
     select

@@ -16,4 +16,5 @@ where
     parcels.address like '%210 S 34%'
     or parcels.address like '%220 S 34%'
     or (parcels.address like '%34TH%' and parcels.owner1 like '%UNIV%PENN%')
+order by bg.geoid
 limit 1
