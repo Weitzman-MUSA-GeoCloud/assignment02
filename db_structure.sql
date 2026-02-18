@@ -1,3 +1,4 @@
+-- Active: 1769627756426@@127.0.0.1@5432@assignment02
 /*
 
 This file contains the SQL commands to prepare the database for your queries.
@@ -31,6 +32,87 @@ running the following command from the command line:
 */
 
 -- Add a column to the septa.bus_stops table to store the geometry of each stop.
+
+
+    create schema if not exists septa;
+    create schema if not exists phl;
+    create schema if not exists census;
+    create extension if not exists postgis;
+
+CREATE TABLE septa.bus_stops (
+    stop_id TEXT,
+    stop_code TEXT,
+    stop_name TEXT,
+    stop_desc TEXT,
+    stop_lat DOUBLE PRECISION,
+    stop_lon DOUBLE PRECISION,
+    zone_id TEXT,
+    stop_url TEXT,
+    location_type INTEGER,
+    parent_station TEXT,
+    stop_timezone TEXT,
+    wheelchair_boarding INTEGER
+);
+
+
+CREATE TABLE septa.bus_routes (
+    route_id TEXT,
+    agency_id TEXT,
+    route_short_name TEXT,
+    route_long_name TEXT,
+    route_desc TEXT,
+    route_type TEXT,
+    route_url TEXT,
+    route_color TEXT,
+    route_text_color TEXT
+);
+
+ALTER TABLE septa.bus_routes
+ADD COLUMN IF NOT EXISTS network_id TEXT;
+
+
+CREATE TABLE septa.bus_trips (
+    route_id TEXT,
+    service_id TEXT,
+    trip_id TEXT,
+    trip_headsign TEXT,
+    trip_short_name TEXT,
+    direction_id TEXT,
+    block_id TEXT,
+    shape_id TEXT,
+    wheelchair_accessible INTEGER,
+    bikes_allowed INTEGER
+);
+
+CREATE TABLE septa.bus_shapes (
+    shape_id TEXT,
+    shape_pt_lat DOUBLE PRECISION,
+    shape_pt_lon DOUBLE PRECISION,
+    shape_pt_sequence INTEGER,
+    shape_dist_traveled DOUBLE PRECISION
+);
+
+CREATE TABLE septa.rail_stops (
+    stop_id TEXT,
+    stop_name TEXT,
+    stop_desc TEXT,
+    stop_lat DOUBLE PRECISION,
+    stop_lon DOUBLE PRECISION,
+    zone_id TEXT,
+    stop_url TEXT
+);
+
+CREATE TABLE census.population_2020 (
+    geoid TEXT,
+    geoname TEXT,
+    total INTEGER
+);
+
+
+
+
+set search_path = public
+
 alter table septa.bus_stops
 add column if not exists geog geography;
 
@@ -41,3 +123,21 @@ set geog = st_makepoint(stop_lon, stop_lat)::geography;
 create index if not exists septa_bus_stops__geog__idx
 on septa.bus_stops using gist
 (geog);
+
+
+CREATE INDEX if NOT EXISTS pwd_parcels_geog_gist
+    ON phl.pwd_parcels
+    USING gist (geog);
+
+CREATE INDEX IF NOT EXISTS bus_stops_geog_gist
+    ON septa.bus_stops
+    USING gist (geog);
+
+create index if not exists bus_shapes_shape_seq_idx
+    on septa.bus_shapes (shape_id, shape_pt_sequence);
+
+create index if not exists bus_trips_shape_idx
+    ON septa.bus_trips (shape_id);
+
+create index if not exists bus_trips_route_idx 
+    on septa.bus_trips(route_id);    
