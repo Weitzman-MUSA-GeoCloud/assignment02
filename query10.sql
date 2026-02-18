@@ -1,7 +1,7 @@
 /*
-  Build a description (alias as stop_desc) for each rail stop using spatial 
+  Build a description (alias as stop_desc) for each rail stop using spatial
   relationships with nearby parcels and neighborhoods.
-  
+
   The description includes:
   - Distance and direction to the nearest parcel
   - The neighborhood the stop is located in

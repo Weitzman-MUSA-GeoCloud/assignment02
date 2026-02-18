@@ -1,6 +1,6 @@
 /*
   With a query, find out how many census block groups Penn's main campus fully contains.
-  
+
   For Penn's main campus, I'm using PWD parcels that have "UNIV OF PENN" or similar
   in their owner name. This captures the main campus area. We then check which
   census block groups are fully contained within the combined campus boundary.
