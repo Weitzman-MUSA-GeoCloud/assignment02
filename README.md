@@ -219,6 +219,18 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
+    My accessibility metric is the **percentage of wheelchair-accessible bus stops** in each neighborhood. According to the GTFS documentation, the `wheelchair_boarding` field in `bus_stops` has the following values:
+    - 0 or empty: No accessibility information available
+    - 1: Some vehicles at this stop can be boarded by a wheelchair user
+    - 2: Wheelchair boarding is not possible at this stop
+
+    The metric is calculated as: `(number of stops with wheelchair_boarding = 1 / total stops in neighborhood) * 100`
+
+    I chose this metric because:
+    1. It directly measures the proportion of stops that are wheelchair-accessible, giving a clear percentage that's easy to understand and compare across neighborhoods.
+    2. A higher percentage indicates better overall wheelchair accessibility infrastructure in that neighborhood.
+    3. By also reporting the raw counts of accessible and inaccessible stops, we can see both the density of accessible stops and the scale of the accessibility challenge in each neighborhood.
+
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
@@ -243,6 +255,14 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+
+    I chose to define Penn's main campus using the **PWD (Philadelphia Water Department) Stormwater Billing Parcels dataset**. Specifically, I selected parcels where the `owner1` field contains variations of "University of Pennsylvania" (e.g., "UNIV OF PENN", "UNIVERSITY PENNSYLVANIA"). This approach is reasonable because:
+
+    1. The PWD parcels dataset contains ownership information for properties in Philadelphia, which allows us to identify parcels owned by Penn.
+    2. By using `ST_Union` to combine all Penn-owned parcels, we create a unified campus boundary.
+    3. We then use `ST_Contains` to find census block groups that are fully contained within this combined campus boundary.
+
+    Note: Given the typical size relationship between a university campus and census block groups, it's likely that the campus doesn't fully contain many (or any) complete block groups, as block groups are designed to have 600-3000 people and university campuses are often integrated into the urban fabric rather than forming isolated superblocks.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
