@@ -1,13 +1,6 @@
 /* Using the `bus_shapes`, `bus_routes`, and `bus_trips` tables from GTFS bus feed, find the **two** routes with the longest trips. */
 
 
- ```sql
-    (
-        route_short_name text,  -- The short name of the route
-        trip_headsign text,  -- Headsign of the trip
-        shape_length numeric  -- Length of the trip in meters, rounded to the nearest meter
-    )
-    ```
 
 create index if not exists bus_shapes_shape_seq_idx
     on septa.bus_shapes (shape_id, shape_pt_sequence);

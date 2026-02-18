@@ -3,7 +3,7 @@
   estimation, consider any block group that intersects the buffer as being part
   of the 800 meter buffer.
 */
-set search_path = public
+set search_path = public；
 
 with
 septa_bus_stop_blockgroups as (

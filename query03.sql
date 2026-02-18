@@ -11,7 +11,7 @@ CREATE INDEX IF NOT EXISTS bus_stops_geog_gist
     ON septa.bus_stops
     USING gist (geog);
 
-set search_path = public
+set search_path = public；
 
 SELECT 
     p.address as parcel_address,
