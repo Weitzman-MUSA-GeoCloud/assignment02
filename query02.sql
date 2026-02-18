@@ -7,6 +7,14 @@
 
 with
 
+philadelphia_bus_stops as (
+    select stops.stop_id
+    from septa.bus_stops as stops
+    inner join census.blockgroups_2020 as bg
+        on st_covers(bg.geog, stops.geog)
+    where bg.geoid like '42101%'
+),
+
 septa_bus_stop_blockgroups as (
     select
         stops.stop_id,
@@ -14,7 +22,8 @@ septa_bus_stop_blockgroups as (
     from septa.bus_stops as stops
     inner join census.blockgroups_2020 as bg
         on st_dwithin(stops.geog, bg.geog, 800)
-    where bg.geoid like '42101%'
+    where stops.stop_id in (select stop_id from philadelphia_bus_stops)
+      and bg.geoid like '42101%'
 ),
 
 septa_bus_stop_surrounding_population as (
@@ -29,7 +38,7 @@ septa_bus_stop_surrounding_population as (
 select
     stops.stop_id,
     stops.stop_name,
-    pop.estimated_pop_800m::integer as estimated_pop_800m
+    pop.estimated_pop_800m
 from septa_bus_stop_surrounding_population as pop
 inner join septa.bus_stops as stops using (stop_id)
 where pop.estimated_pop_800m > 500
