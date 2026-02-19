@@ -26,33 +26,35 @@
   )
 */
 
-with shape_lengths as(
-  select
-    shape_id,
-    round(
-      st_length(
-        st_makeline(
-          st_setsrid(st_makepoint(shape_pt_lon, shape_pt_lat), 4326)
-          order by shape_pt_sequence
-        )::geography
-      )
-    ) as shape_length
-  from septa.bus_shapes
-  group by shape_id
+with shape_lengths as (
+    select
+        shape_id,
+        round(
+            st_length(
+                st_makeline(
+                    st_setsrid(st_makepoint(shape_pt_lon, shape_pt_lat), 4326)
+                    order by shape_pt_sequence
+                )::geography
+            )
+        ) as shape_length
+    from septa.bus_shapes
+    group by shape_id
 ),
+
 trip_info as (
-  select
-    route.route_short_name,
-    trip.trip_headsign,
-    shape.shape_length,
-    row_number() over (order by shape.shape_length desc) as rownumber
-  from shape_lengths as shape
-  inner join septa.bus_trips as trip on shape.shape_id = trip.shape_id
-  inner join septa.bus_routes as route on trip.route_id = route.route_id
+    select
+        route.route_short_name,
+        trip.trip_headsign,
+        shape.shape_length,
+        row_number() over (order by shape.shape_length desc) as rownumber
+    from shape_lengths as shape
+    inner join septa.bus_trips as trip on shape.shape_id = trip.shape_id
+    inner join septa.bus_routes as route on trip.route_id = route.route_id
 )
+
 select
-  route_short_name,
-  trip_headsign,
-  round(shape_length::numeric) as shape_length
+    route_short_name,
+    trip_headsign,
+    round(shape_length::numeric) as shape_length
 from trip_info
 where rownumber <= 2;

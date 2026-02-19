@@ -137,6 +137,18 @@ ogr2ogr `
     -overwrite `
     "data/tl_2020_42_bg/tl_2020_42_bg.shp"
 
+ogr2ogr `
+    -f "PostgreSQL" `
+    PG:"host=localhost port=5433 dbname=assignment_02 user=postgres password=postgres" `
+    -nln phl.pedestrian_ramps `
+    -nlt POINT `
+    -t_srs EPSG:4326 `
+    -lco GEOMETRY_NAME=geog `
+    -lco GEOM_TYPE=GEOGRAPHY `
+    -lco PRECISION=NO `
+    -overwrite `
+    "data/pedestrian_ramps.json"
+
 psql -h localhost -p 5433 -U postgres -d assignment_02 -c "\copy septa.rail_stops (stop_id, stop_name, stop_desc, stop_lat, stop_lon, zone_id, stop_url) FROM 'data/gtfs_public/google_rail/stops.txt' WITH (FORMAT csv, HEADER true);"
 
 psql -h localhost -p 5433 -U postgres -d assignment_02 -c "\copy septa.bus_stops (stop_id, stop_name, stop_lat, stop_lon, location_type, parent_station, zone_id, wheelchair_boarding) FROM 'data/gtfs_public/google_bus/stops.txt' WITH (FORMAT csv, HEADER true);"

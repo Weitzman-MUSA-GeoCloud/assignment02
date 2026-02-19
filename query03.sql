@@ -19,16 +19,17 @@
 */
 
 select
-  phl.pwd_parcels.address as parcel_address,
-  nearest.stop_name as stop_name,
-  nearest.distance as distance
+    pwd_parcels.address as parcel_address,
+    nearest.stop_name,
+    nearest.distance
 from phl.pwd_parcels
-cross join lateral (
-  select
-    stop_name,
-    round(st_distance(phl.pwd_parcels.geog, septa.bus_stops.geog)::numeric, 2) as distance
-  from septa.bus_stops
-  order by phl.pwd_parcels.geog <-> septa.bus_stops.geog
-  limit 1
-) as nearest
+cross join
+    lateral (
+        select
+            septa.bus_stops.stop_name,
+            round(st_distance(phl.pwd_parcels.geog, septa.bus_stops.geog)::numeric, 2) as distance
+        from septa.bus_stops
+        order by phl.pwd_parcels.geog <-> septa.bus_stops.geog
+        limit 1
+    ) as nearest
 order by nearest.distance desc;
