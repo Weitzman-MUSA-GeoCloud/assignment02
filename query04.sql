@@ -27,34 +27,76 @@
 */
 
 with shape_lengths as (
+    -- Reconstruct each bus route shape as single line geometry,
+    -- then measure meters length.
     select
         shape_id,
         round(
             st_length(
+                -- Build line from shape points, ordered by sequence
+                -- for right path direction.
                 st_makeline(
                     st_setsrid(st_makepoint(shape_pt_lon, shape_pt_lat), 4326)
                     order by shape_pt_sequence
+                -- Cast to geography to get meters distance.
                 )::geography
             )
         ) as shape_length
     from septa.bus_shapes
+    -- Aggregate all points belonging to same shape into one line.
     group by shape_id
 ),
 
-trip_info as (
+unique_trips as (
     select
-        route.route_short_name,
-        trip.trip_headsign,
+        -- 1 shape to 1 trip and route before ranking to prevent duplicates.
+        distinct on (shape.shape_id)
+        shape.shape_id,
         shape.shape_length,
-        row_number() over (order by shape.shape_length desc) as rownumber
+        trip.trip_headsign,
+        route.route_short_name
     from shape_lengths as shape
     inner join septa.bus_trips as trip on shape.shape_id = trip.shape_id
     inner join septa.bus_routes as route on trip.route_id = route.route_id
+    order by shape.shape_id
 )
 
+trip_info as (
+    -- Rank unique shapes from longest to shortest.
+    select
+        route_short_name,
+        trip_headsign,
+        shape_length,
+        row_number() over (order by shape_length desc) as rownumber
+    from unique_trips
+)
+
+-- Return two trips w/ biggest shape length.
 select
     route_short_name,
     trip_headsign,
-    round(shape_length::numeric) as shape_length
+    shape_length
 from trip_info
 where rownumber <= 2;
+
+/*
+AI used to help with query. Free model Claude Haiku 4.5.
+
+Prompt:
+Don't give me answer. I'm having duplication issues and
+a single-row issue when I use distinct. Is there something
+wrong in my logic or conceptual understanding of how I'm
+tackling this question?
+
+Original, no distinct clause:
+"130"    "Bucks County Community College"    46505
+"130"    "Bucks County Community College"    46505
+
+Distinct clause added:
+"130"    "Bucks County Community College"    46505
+
+Expected:
+route_short_name,trip_headsign,shape_length
+"130","Bucks County Community College",46684
+"128","Oxford Valley Mall",44044
+*/
