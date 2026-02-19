@@ -9,3 +9,15 @@
     geo_id text
   )
 */
+
+select bg.geoid as geo_id
+from
+    census.blockgroups_2020 as bg
+inner join
+    phl.pwd_parcels as parcels
+    on st_contains(
+        bg.geog::geometry,
+        parcels.geog::geometry
+    )
+where
+    parcels.address like '220-30 S 34TH ST';
