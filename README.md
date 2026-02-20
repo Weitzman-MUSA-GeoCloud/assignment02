@@ -636,6 +636,12 @@ limit 5;
 | MELROSE_PARK_GARDENS | 1 | 16 | 0 |
 | OLNEY | 0 | 172 | 0 |
 
+AI used to help with query. Free model Claude Haiku 4.5.
+
+Prompt: Don't give me answer. I'm getting null values showing up despite ordering them, is there a way to replace with 0? I want to make sure all stops show up.
+
+(Resolved by using coalesce to replace null with 0 for num_bus_stops_inaccessible.)
+
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
 
     **Both #6 and #7 should have the structure:**
@@ -860,7 +866,95 @@ where
    >**Tip when experimenting:** Use subqueries to limit your query to just a few rows to keep query times faster. Once your query is giving you answers you want, scale it up. E.g., instead of `FROM tablename`, use `FROM (SELECT * FROM tablename limit 10) as t`.
 
 ```sql
--- PLACEHOLDER
+with liberty_bell as (
+    -- Liberty Bell coordinates as ref point.
+    select st_setsrid(
+        st_makepoint(-75.15031592068193, 39.949548328739006),
+        4326
+    )::geography as geog
+),
+
+rail_stops_with_geom as (
+    select
+        rail_stops.stop_id,
+        rail_stops.stop_name,
+        rail_stops.stop_lat,
+        rail_stops.stop_lon,
+        -- Rail stop coordinates to geography for distance.
+        st_setsrid(
+            st_makepoint(rail_stops.stop_lon, rail_stops.stop_lat),
+            4326
+        )::geography as stop_geog
+    from septa.rail_stops
+),
+
+distance_to_liberty_bell as (
+    -- Calculate distance from rail stops to Liberty Bell.
+    select
+        rail_geom.stop_id,
+        round(
+            st_distance(rail_geom.stop_geog, bell.geog)::numeric,
+            0
+        ) as distance_meters
+    from rail_stops_with_geom as rail_geom
+    cross join liberty_bell as bell
+),
+
+containing_neighborhood as (
+    -- Find which neighborhood contains rail stop.
+    select
+        rail_geom.stop_id,
+        neighborhoods.name as neighborhood_name
+    from rail_stops_with_geom as rail_geom
+    left join phl.neighborhoods
+        on st_within(
+            rail_geom.stop_geog::geometry,
+            st_setsrid(neighborhoods.geog::geometry, 4326)
+        )
+)
+
+-- Combine Liberty Bell distance and neighborhood into description,
+-- and reorder columns according to assignment.
+select
+    final.stop_id,
+    final.stop_name,
+    final.stop_desc,
+    final.stop_lon,
+    final.stop_lat
+from (
+    select
+        rail_geom.stop_id,
+        rail_geom.stop_name,
+        rail_geom.stop_lon,
+        rail_geom.stop_lat,
+        concat(
+            distance_to_liberty_bell.distance_meters::text,
+            'm from LETTING THAT FREEDOM RING! 🔔🦅 #',
+            upper(coalesce(containing_neighborhood.neighborhood_name, 'Philadelphia'))
+        ) as stop_desc
+    from rail_stops_with_geom as rail_geom
+    left join distance_to_liberty_bell on rail_geom.stop_id = distance_to_liberty_bell.stop_id
+    left join containing_neighborhood on rail_geom.stop_id = containing_neighborhood.stop_id
+) as final
+order by final.stop_id;
 ```
 
-**Result:** TBD
+**Result:**
+
+| stop_id | stop_name | stop_desc | stop_lon | stop_lat |
+|---|---|---|---|---|
+| 90001 | Cynwyd | 9408m from LETTING FREEDOM RING! 🔔🦅 #PHILADELPHIA  | -75.2316667 | 40.0066667 |
+| 90002 | Bala | 8750m from LETTING FREEDOM RING! 🔔🦅 #PHILADELPHIA  | -75.2277778 | 40.0011111 |
+| 90003 | Wynnefield Avenue | 7842m from LETTING FREEDOM RING! 🔔🦅 #WYNNEFIELD  | -75.2255556 | 39.99 |
+| 90004 | Gray 30th Street | 2793m from LETTING FREEDOM RING! 🔔🦅 #UNIVERSITY_CITY  | -75.1816667 | 39.9566667 |
+| 90005 | Suburban Station | 1568m from LETTING FREEDOM RING! 🔔🦅 #LOGAN_SQUARE  | -75.1677778 | 39.9538889 |
+
+AI used to help with query. Free model Claude Haiku 4.5.
+
+Prompt: Don't give me answer. Having trouble with upper function where
+"function upper(record) does not exist", what's the issue behind
+that error? On that note is there a function to reorder columns in
+the final table?
+
+(Resolved by using coalesce to handle null neighborhood names, and by
+selecting columns in desired order in final select statement.)

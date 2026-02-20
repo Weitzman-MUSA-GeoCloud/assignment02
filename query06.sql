@@ -114,3 +114,13 @@ order by
     accessible_summary.accessibility_metric desc,
     accessible_summary.num_bus_stops_accessible desc
 limit 5;
+
+/*
+AI used to help with query. Free model Claude Haiku 4.5.
+
+Prompt:
+Don't give me answer. I'm getting null values showing up despite ordering
+them, is there a way to replace with 0? I want to make sure all stops show up.
+
+(Resolved by using coalesce to replace null with 0 for num_bus_stops_inaccessible.)
+*/
