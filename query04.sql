@@ -26,9 +26,9 @@
   )
 */
 
+-- Reconstruct each bus route shape as single line geometry,
+-- then measure meters length.
 with shape_lengths as (
-    -- Reconstruct each bus route shape as single line geometry,
-    -- then measure meters length.
     select
         shape_id,
         round(
@@ -48,9 +48,8 @@ with shape_lengths as (
 ),
 
 unique_trips as (
-    select
-        -- 1 shape to 1 trip and route before ranking to prevent duplicates.
-        distinct on (shape.shape_id)
+    -- 1 shape to 1 trip and route before ranking to prevent duplicates.
+    select distinct on (shape.shape_id)
         shape.shape_id,
         shape.shape_length,
         trip.trip_headsign,
@@ -59,7 +58,7 @@ unique_trips as (
     inner join septa.bus_trips as trip on shape.shape_id = trip.shape_id
     inner join septa.bus_routes as route on trip.route_id = route.route_id
     order by shape.shape_id
-)
+),
 
 trip_info as (
     -- Rank unique shapes from longest to shortest.
@@ -99,4 +98,7 @@ Expected:
 route_short_name,trip_headsign,shape_length
 "130","Bucks County Community College",46684
 "128","Oxford Valley Mall",44044
+
+(Resolved by creating unique trips w/ distinct on shape_id
+before ranking to prevent duplicates.)
 */

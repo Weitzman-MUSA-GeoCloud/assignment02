@@ -21,17 +21,20 @@
 select count(bg.geoid) as count_block_groups
 from
     census.blockgroups_2020 as bg
+-- Join parcels to block groups where parcel geometry falls within block group.
 inner join
     phl.pwd_parcels as parcels
     on st_contains(
         bg.geog::geometry,
         parcels.geog::geometry
     )
+-- Filter to parcels where owner name matches UPenn ownership variations.
 where (
-        parcels.owner1 like 'TRS UNIV OF PENN'
-        or parcels.owner1 like 'TRUSTEES'
-        or parcels.owner1 like 'UNIVERSITY'
-        or parcels.owner1 like 'U OF P'
-    )
-    and parcels.owner1 not like 'DREXEL'
-    and parcels.owner1 not like 'TEMPLE'
+    parcels.owner1 like 'TRS UNIV OF PENN'
+    or parcels.owner1 like 'TRUSTEES'
+    or parcels.owner1 like 'UNIVERSITY'
+    or parcels.owner1 like 'U OF P'
+)
+-- Exclude other university parcels.
+and parcels.owner1 not like 'DREXEL'
+and parcels.owner1 not like 'TEMPLE'

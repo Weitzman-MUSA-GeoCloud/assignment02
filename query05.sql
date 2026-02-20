@@ -13,7 +13,14 @@
   bus stops where wheelchair_boarding = 1, then counts the total number of
   pedestrian ramps within 150 meters of any of those stops based on rough
   average block measurements in Google Maps. Neighborhoods with more nearby
-  ramps near accessible stops are considered more accessible.
+  ramps near accessible stops are considered more accessible. This has its
+  limitations as it doesn't account for the quality of the ramps, the side of
+  the street the ramps are on,or the actual routes of the bus stops, but it
+  provides a starting point for assessing accessibility based on proximity
+  to pedestrian infrastructure.
+
+  [DVRPC Data Page Link](https://catalog.dvrpc.org/dataset/dvrpc-pedestrian-ramps)
+  [GeoJSON Direct Link](https://arcgis.dvrpc.org/portal/rest/services/transportation/pedestriannetwork_points/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson)
 */
 
 with
@@ -23,30 +30,44 @@ accessible_stops as (
         stop_name,
         geog
     from septa.bus_stops
+    -- Filter wheelchair-accessible bus stops.
     where wheelchair_boarding = 1
 ),
 
 stops_in_neighborhoods as (
     select
         neighborhoods.name as neighborhood_name,
-        acc.stop_id,
-        acc.geog as stop_geog
+        accessible_stops.stop_id,
+        accessible_stops.geog as stop_geog
     from phl.neighborhoods as neighborhoods
-    inner join accessible_stops as acc
-        on st_within(acc.geog::geometry, neighborhoods.geog::geometry)
+    -- Join accessible stops to neighborhoods.
+    inner join accessible_stops
+        on st_within(
+            accessible_stops.geog::geometry,
+            neighborhoods.geog::geometry
+        )
 ),
 
 ramps_near_stops as (
     select
-        stopn.neighborhood_name,
-        stopn.stop_id,
+        stops_in_neighborhoods.neighborhood_name,
+        stops_in_neighborhoods.stop_id,
         count(ramps.ogc_fid) as nearby_ramp_count
-    from stops_in_neighborhoods as stopn
+    from stops_in_neighborhoods
     left join phl.pedestrian_ramps as ramps
-        on st_dwithin(stopn.stop_geog::geography, ramps.geog::geography, 150)
-    group by stopn.neighborhood_name, stopn.stop_id
+        -- Count pedestrian ramps within 150m of accessible stops.
+        on st_dwithin(
+            stops_in_neighborhoods.stop_geog::geography,
+            ramps.geog::geography,
+            150
+        )
+    group by
+        stops_in_neighborhoods.neighborhood_name,
+        stops_in_neighborhoods.stop_id
 )
 
+-- Aggregate counts per neighborhood for total accessible stops
+-- and nearby ramps as accessibility metric.
 select
     neighborhood_name,
     count(stop_id) as total_accessible_stops,

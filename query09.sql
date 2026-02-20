@@ -13,6 +13,7 @@
 select bg.geoid as geo_id
 from
     census.blockgroups_2020 as bg
+-- Join parcels to block groups where parcel is within block group.
 inner join
     phl.pwd_parcels as parcels
     on st_contains(
@@ -20,4 +21,5 @@ inner join
         parcels.geog::geometry
     )
 where
+    -- Address for Meyerson Hall for filtering as typed in parcel data.
     parcels.address like '220-30 S 34TH ST';
