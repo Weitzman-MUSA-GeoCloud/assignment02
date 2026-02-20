@@ -28,8 +28,6 @@ septa_bus_stop_blockgroups as (
             -- Keep block groups whose boundary falls within 800 meters 
             -- of stop.
             st_dwithin(stops.geog::geography, bg.geog::geography, 800)
-            -- Exclude block group that stop sits inside.
-            and not st_intersects(stops.geog::geography, bg.geog::geography)
     -- Restrict to Philadelphia county block groups only.
     where bg.geoid like '42101%'
 ),
