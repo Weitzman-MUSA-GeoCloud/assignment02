@@ -41,3 +41,43 @@ set geog = st_makepoint(stop_lon, stop_lat)::geography;
 create index if not exists septa_bus_stops__geog__idx
 on septa.bus_stops using gist
 (geog);
+
+alter table septa.rail_stops
+add column if not exists geog geography;
+
+update septa.rail_stops
+set geog = st_makepoint(stop_lon, stop_lat)::geography;
+
+create index if not exists septa_rail_stops__geog__idx
+on septa.rail_stops using gist
+(geog);
+
+create index if not exists phl_pwd_parcels__geog__idx
+on phl.pwd_parcels using gist
+(geog);
+
+create index if not exists phl_neighborhoods__geog__idx
+on phl.neighborhoods using gist
+(geog);
+
+create index if not exists census_blockgroups_2020__geog__idx
+on census.blockgroups_2020 using gist
+(geog);
+
+create index if not exists septa_bus_shapes__shape_id__shape_pt_sequence__idx
+on septa.bus_shapes (shape_id, shape_pt_sequence);
+
+create index if not exists septa_bus_trips__shape_id__idx
+on septa.bus_trips (shape_id);
+
+create index if not exists septa_bus_trips__route_id__idx
+on septa.bus_trips (route_id);
+
+create index if not exists septa_bus_routes__route_id__idx
+on septa.bus_routes (route_id);
+
+create index if not exists census_population_2020__geoid__idx
+on census.population_2020 (geoid);
+
+create index if not exists census_blockgroups_2020__geoid__idx
+on census.blockgroups_2020 (geoid);
