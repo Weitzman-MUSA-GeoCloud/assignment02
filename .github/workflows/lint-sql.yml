@@ -1,0 +1,25 @@
+name: Lint SQL files
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    paths: [ '**/run_linter.sh', '**sql**' ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.10"
+        cache: 'pip'
+    - name: Install Python dependencies
+      run: pip install sqlfluff
+    - name: Run linter
+      run: |
+        sqlfluff lint --dialect postgres .
