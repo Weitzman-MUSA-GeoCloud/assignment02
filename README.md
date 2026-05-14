@@ -219,6 +219,20 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
+    The accessibility metric is the **proportion of bus stops in a neighborhood that are explicitly wheelchair accessible**, calculated as:
+
+    ```
+    accessibility_metric = num_bus_stops_accessible / total_bus_stops_in_neighborhood
+    ```
+
+    Where:
+    - `num_bus_stops_accessible` = count of stops with `wheelchair_boarding = 1` (at least some vehicles are wheelchair accessible)
+    - `num_bus_stops_inaccessible` = count of stops with `wheelchair_boarding ≠ 1` (either no information or explicitly inaccessible)
+
+    A value of `1.0` means every stop in the neighborhood is accessible; `0.0` means none are. Neighborhoods with no bus stops are excluded.
+
+    This metric was chosen because it captures the fraction of transit access points that a wheelchair user can reliably use. Treating `wheelchair_boarding = 0` (no information) as inaccessible is conservative but appropriate — an unknown stop offers no guarantee of accessibility, so it should not be counted as safe for a wheelchair user.
+
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
@@ -243,6 +257,10 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+
+    I used the **Philadelphia Water Department Stormwater Billing Parcels** dataset (`phl.pwd_parcels`) to define Penn's main campus boundary. The campus is defined as the union of all parcels where the `owner1` field contains `'UNIVERSITY OF PENNSYLVANIA'`. The union dissolves internal parcel boundaries so that the resulting polygon represents the contiguous campus footprint.
+
+    This dataset was chosen because it provides parcel-level ownership data for every property in Philadelphia. By filtering on University of Pennsylvania ownership, we can construct a precise campus boundary without needing a separately curated campus polygon. One limitation is that this approach captures all Penn-owned property in the city, not just the contiguous University City campus — properties like off-campus health facilities could be included. A future refinement could add a spatial filter (e.g., within a bounding box around University City) to restrict results to the main campus only.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 

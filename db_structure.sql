@@ -41,3 +41,11 @@ set geog = st_makepoint(stop_lon, stop_lat)::geography;
 create index if not exists septa_bus_stops__geog__idx
 on septa.bus_stops using gist
 (geog);
+
+-- Index to speed up query04: joining bus_trips to bus_shapes by shape_id.
+create index if not exists septa_bus_trips__shape_id__idx
+on septa.bus_trips (shape_id);
+
+-- Index to speed up query04: grouping bus_shapes by shape_id.
+create index if not exists septa_bus_shapes__shape_id__idx
+on septa.bus_shapes (shape_id);
