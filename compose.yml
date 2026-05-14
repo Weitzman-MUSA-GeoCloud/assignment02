@@ -1,6 +1,7 @@
 # Create a postgis service using the postgis/postgis image.
 services:
   db:
+    platform: linux/amd64
     # Database image pre-loaded with initial table structure
     image: ghcr.io/weitzman-musa-geocloud/assignment02:main
     environment:

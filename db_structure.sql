@@ -41,3 +41,22 @@ set geog = st_makepoint(stop_lon, stop_lat)::geography;
 create index if not exists septa_bus_stops__geog__idx
 on septa.bus_stops using gist
 (geog);
+
+-- Index on phl.pwd_parcels geog for nearest-neighbor queries (Q3).
+create index if not exists phl_pwd_parcels__geog__idx
+on phl.pwd_parcels using gist
+(geog);
+
+-- Index on census.blockgroups_2020 geog for spatial joins (Q1, Q2, Q8).
+create index if not exists census_blockgroups_2020__geog__idx
+on census.blockgroups_2020 using gist
+(geog);
+
+-- Index on septa.bus_shapes shape_id + sequence for ST_MakeLine ordering (Q4).
+create index if not exists septa_bus_shapes__shape_id__idx
+on septa.bus_shapes (shape_id, shape_pt_sequence);
+
+-- Index on phl.neighborhoods geog for spatial joins (Q5, Q6, Q7).
+create index if not exists phl_neighborhoods__geog__idx
+on phl.neighborhoods using gist
+(geog);

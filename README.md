@@ -161,7 +161,37 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
 1.  Which **eight** bus stop have the largest population within 800 meters? As a rough estimation, consider any block group that intersects the buffer as being part of the 800 meter buffer.
 
+    **Answer:**
+
+    | stop_id | stop_name | estimated_pop_800m |
+    |---|---|---|
+    | 22272 | Lombard St & 18th St | 57936 |
+    | 25080 | Rittenhouse Sq & 18th St | 57571 |
+    | 24284 | Snyder Av & 9th St | 57412 |
+    | 22273 | 19th St & Lombard St | 57019 |
+    | 14958 | Lombard St & 19th St | 57019 |
+    | 3042 | Locust St & 16th St | 56309 |
+    | 25083 | 16th St & Locust St | 56309 |
+    | 22241 | South St & 19th St | 55789 |
+
+    I used `ST_DWithin` to find all census block groups within 800 meters of each bus stop, joined with `census.population_2020` to sum the total population per stop, sorted descending and limited to 8. See `query01.sql`.
+
 2.  Which **eight** bus stops have the smallest population above 500 people _inside of Philadelphia_ within 800 meters of the stop (Philadelphia county block groups have a geoid prefix of `42101` -- that's `42` for the state of PA, and `101` for Philadelphia county)?
+
+    **Answer:**
+
+    | stop_id | stop_name | estimated_pop_800m |
+    |---|---|---|
+    | 30840 | Delaware Av & Tioga St | 593 |
+    | 31499 | Delaware Av & Castor Av | 593 |
+    | 31500 | Delaware Av & Venango St | 593 |
+    | 27000 | Bethlehem Pk & Chesney Ln | 655 |
+    | 27152 | Bethlehem Pk & Chesney Ln | 655 |
+    | 31788 | Northwestern Av & Stenton Av | 655 |
+    | 30839 | Delaware Av & Wheatsheaf Ln | 684 |
+    | 19603 | Long Ln & Glenwood Av - FS | 729 |
+
+    Same approach as Q1, but filtered to Philadelphia county block groups only (`geoid` prefix `42101`) and requiring population > 500. See `query02.sql`.
 
     **The queries to #1 & #2 should generate results with a single row, with the following structure:**
 
@@ -174,6 +204,18 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
 3.  Using the Philadelphia Water Department Stormwater Billing Parcels dataset, pair each parcel with its closest bus stop. The final result should give the parcel address, bus stop name, and distance apart in meters, rounded to two decimals. Order by distance (largest on top).
+
+    **Answer:** Top 5 rows (largest distance first):
+
+    | parcel_address | stop_name | distance |
+    |---|---|---|
+    | 170 SPRING LN | Ridge Av & Ivins Rd | 1658.82 |
+    | 150 SPRING LN | Ridge Av & Ivins Rd | 1620.32 |
+    | 130 SPRING LN | Ridge Av & Ivins Rd | 1611.02 |
+    | 190 SPRING LN | Ridge Av & Ivins Rd | 1490.10 |
+    | 630 SAINT ANDREW RD | Germantown Av & Springfield Av | 1418.42 |
+
+    I used `CROSS JOIN LATERAL` with `ORDER BY geog <-> geog LIMIT 1` for a KNN index scan to find the nearest bus stop per parcel, then `ST_Distance` for exact distance in meters. See `query03.sql`.
 
     _Your query should run in under two minutes._
 
@@ -189,6 +231,15 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
 4.  Using the `bus_shapes`, `bus_routes`, and `bus_trips` tables from GTFS bus feed, find the **two** routes with the longest trips.
+
+    **Answer:**
+
+    | route_short_name | trip_headsign | shape_length |
+    |---|---|---|
+    | 130 | Bucks County Community College | 46684 |
+    | 128 | Oxford Valley Mall | 44044 |
+
+    I reconstructed each shape as a line using `ST_MakeLine(...  ORDER BY shape_pt_sequence)`, computed `ST_Length(::geography)` in meters, selected the longest trip per route with `ROW_NUMBER()`, and took the top 2. See `query04.sql`.
 
     _Your query should run in under two minutes._
 
@@ -219,9 +270,31 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
+    My metric is the **ratio of wheelchair-accessible stops to all stops with a known accessibility status** within each neighborhood. Specifically, I count stops where `wheelchair_boarding = 1` as accessible and `wheelchair_boarding = 2` as inaccessible. Stops with `wheelchair_boarding = 0` (unknown) are excluded from both the numerator and denominator, since they carry no information. The metric ranges from 0.0 (no accessible stops) to 1.0 (all stops accessible). Neighborhoods with no stops that have a known status are excluded entirely. This approach rewards neighborhoods that have genuinely confirmed accessible infrastructure rather than penalizing unknown-status stops, which could simply reflect data gaps rather than true inaccessibility.
+
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
+    **Answer:** These neighborhoods have 100% of their stops with known accessibility status confirmed accessible, and the most total accessible stops. See `query06.sql`.
+
+    | neighborhood_name | accessibility_metric | num_bus_stops_accessible | num_bus_stops_inaccessible |
+    |---|---|---|---|
+    | OLNEY | 1.0000 | 170 | 0 |
+    | SOMERTON | 1.0000 | 165 | 0 |
+    | BUSTLETON | 1.0000 | 158 | 0 |
+    | OXFORD_CIRCLE | 1.0000 | 139 | 0 |
+    | MAYFAIR | 1.0000 | 138 | 0 |
+
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
+
+    **Answer:** These neighborhoods have the lowest wheelchair accessibility ratio among all neighborhoods with known stop data. See `query07.sql`.
+
+    | neighborhood_name | accessibility_metric | num_bus_stops_accessible | num_bus_stops_inaccessible |
+    |---|---|---|---|
+    | BARTRAM_VILLAGE | 0.0000 | 0 | 14 |
+    | WOODLAND_TERRACE | 0.2000 | 2 | 8 |
+    | SOUTHWEST_SCHUYLKILL | 0.4423 | 23 | 29 |
+    | PASCHALL | 0.4571 | 32 | 38 |
+    | CEDAR_PARK | 0.5000 | 20 | 20 |
 
     **Both #6 and #7 should have the structure:**
     ```sql
@@ -235,6 +308,12 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
 8.  With a query, find out how many census block groups Penn's main campus fully contains. Discuss which dataset you chose for defining Penn's campus.
 
+    **Answer: 26 block groups** are fully contained within Penn's campus boundary. See `query08.sql`.
+
+    | count_block_groups |
+    |---|
+    | 26 |
+
     **Structure (should be a single value):**
     ```sql
     (
@@ -244,7 +323,15 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Discussion:**
 
+    I used the **`phl.pwd_parcels`** dataset to define Penn's campus boundary. PWD parcels are registered under owner names like `TRUSTEES OF THE UNIVERSITY OF PENNSYLVAN` and related variants, so I filtered with `upper(owner1) LIKE '%TRUSTEES%'` combined with `LIKE '%UNIV%PENN%' OR LIKE '%U OF P%'`. Since the 13 matched parcels are scattered (their union has a total area of ~43,000 sq m), I applied `ST_ConvexHull` to the union to create a contiguous campus footprint. A block group is counted only if it is **fully contained** (`ST_Within`) within this convex hull boundary.
+
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
+
+    **Answer: `421010170001`** — the block group containing Meyerson Hall (210 S 34th St). I located the building by matching its address in `phl.pwd_parcels` and used `ST_Within` to find the containing block group, without constructing any point geometry. See `query09.sql`.
+
+    | geo_id |
+    |---|
+    | 421010170001 |
 
     **Structure (should be a single value):**
     ```sql
@@ -254,6 +341,18 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
 10. You're tasked with giving more contextual information to rail stops to fill the `stop_desc` field in a GTFS feed. Using any of the data sets above, PostGIS functions (e.g., `ST_Distance`, `ST_Azimuth`, etc.), and PostgreSQL string functions, build a description (alias as `stop_desc`) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible), and other methods of describing the relationships. SQL's `CASE` statements may be helpful for some operations.
+
+    **Answer:** Sample results (first 5 stops alphabetically):
+
+    | stop_id | stop_name | stop_desc | stop_lon | stop_lat |
+    |---|---|---|---|---|
+    | 90314 | 49th Street | 0 meters W of 1100 S 49th St | -75.2166667 | 39.9436111 |
+    | 90539 | 9th Street Lansdale | 18087 meters N of 9600 Stenton Ave | -75.2791667 | 40.25 |
+    | 90404 | Airport Terminal A | 0 meters W of 8500 Essington Ave | -75.2452778 | 39.8761111 |
+    | 90403 | Airport Terminal B | 0 meters W of 8500 Essington Ave | -75.2413889 | 39.8772222 |
+    | 90402 | Airport Terminal C D | 0 meters W of 8500 Essington Ave | -75.24 | 39.8780556 |
+
+    For each rail stop I used `CROSS JOIN LATERAL` KNN to find the nearest PWD parcel, `ST_Distance` for the distance in meters, and `ST_Azimuth` converted to 8 compass directions (N/NE/E/SE/S/SW/W/NW) via a `CASE` statement. Dataset: `phl.pwd_parcels` from [OpenDataPhilly](https://opendataphilly.org/dataset/pwd-stormwater-billing-parcels). See `query10.sql`.
 
     **Structure:**
     ```sql
