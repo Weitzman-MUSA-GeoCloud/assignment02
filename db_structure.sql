@@ -41,3 +41,34 @@ set geog = st_makepoint(stop_lon, stop_lat)::geography;
 create index if not exists septa_bus_stops__geog__idx
 on septa.bus_stops using gist
 (geog);
+
+-- Add a geography column to septa.rail_stops and index it.
+alter table septa.rail_stops
+add column if not exists geog geography;
+
+update septa.rail_stops
+set geog = st_makepoint(stop_lon, stop_lat)::geography;
+
+create index if not exists septa_rail_stops__geog__idx
+on septa.rail_stops using gist
+(geog);
+
+-- Spatial index on phl.pwd_parcels for nearest-neighbor queries (query03).
+create index if not exists phl_pwd_parcels__geog__idx
+on phl.pwd_parcels using gist
+(geog);
+
+-- Spatial index on phl.neighborhoods for spatial joins (query05-07).
+create index if not exists phl_neighborhoods__geog__idx
+on phl.neighborhoods using gist
+(geog);
+
+-- Indexes on septa.bus_shapes and bus_trips to speed up query04.
+create index if not exists septa_bus_shapes__shape_id__idx
+on septa.bus_shapes (shape_id);
+
+create index if not exists septa_bus_trips__shape_id__idx
+on septa.bus_trips (shape_id);
+
+create index if not exists septa_bus_trips__route_id__idx
+on septa.bus_trips (route_id);

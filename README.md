@@ -219,6 +219,14 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
+    The accessibility metric is the **ratio of wheelchair-accessible stops to all stops with known accessibility status** within each neighborhood:
+
+    ```
+    accessibility_metric = num_accessible / (num_accessible + num_inaccessible)
+    ```
+
+    Bus stops with `wheelchair_boarding = 1` (accessible) and `wheelchair_boarding = 2` (not accessible) are counted. Stops with `wheelchair_boarding = 0` (no information) are excluded from both the numerator and denominator, so they do not unfairly penalize neighborhoods where data is missing. A score of `1.0` means every rated stop in the neighborhood is accessible; `0.0` means none are. Only neighborhoods with at least one rated stop are included.
+
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
@@ -243,6 +251,8 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+
+    Penn's main campus boundary is defined as a rectangular envelope using the approximate geographic extents of the core academic campus: longitude -75.2010 to -75.1756 (roughly 40th St to 32nd St) and latitude 39.9430 to 39.9560 (roughly Baltimore Ave to Walnut St). This bounding box was created with `ST_MakeEnvelope` since no campus shapefile is available in the loaded datasets. The result — 13 block groups fully contained within that boundary — reflects the dense urban block structure of University City. A tighter or more precise campus polygon (e.g., from OpenStreetMap) would likely reduce this count.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 

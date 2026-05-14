@@ -3,6 +3,7 @@ services:
   db:
     # Database image pre-loaded with initial table structure
     image: ghcr.io/weitzman-musa-geocloud/assignment02:main
+    platform: linux/amd64
     environment:
       POSTGRES_PASSWORD: postgres
     healthcheck:
