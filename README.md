@@ -219,6 +219,16 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
+    The metric is the **percentage of bus stops within the neighborhood that are explicitly marked wheelchair accessible** (`wheelchair_boarding = 1`) out of _all_ bus stops in the neighborhood:
+
+    ```
+    accessibility_metric = 100 × (# stops with wheelchair_boarding = 1) / (# total stops in neighborhood)
+    ```
+
+    Stops with `wheelchair_boarding = 0` (no information / inherit from parent) are treated the same as inaccessible stops — they count toward the denominator but not the numerator. This gives a conservative, pessimistic lower bound: a neighborhood full of "unknown" stops scores 0%, which appropriately signals that accessibility information is missing rather than confirmed. Stops with `wheelchair_boarding = 2` are explicitly inaccessible and also count only in the denominator.
+
+    Neighborhoods with no bus stops receive a `NULL` metric and are excluded from the top/bottom rankings.
+
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
@@ -243,6 +253,10 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+
+    I used the **Philadelphia Water Department (PWD) Stormwater Billing Parcels** dataset (`phl.pwd_parcels`) to define Penn's main campus. Parcels owned by `TRUSTEES OF THE UNIVERSITY OF PENNSYLVANIA` (matched via `owner1 ILIKE`) were unioned into a single polygon. To restrict the result to the contiguous West Philadelphia main campus — and exclude Penn Medicine facilities and other University-owned properties elsewhere in the city — I added a `ST_DWithin` filter requiring parcels to be within 1,500 meters of the geographic center of the main campus (approximately −75.193°W, 39.952°N, near 3451 Walnut St).
+
+    The resulting campus polygon was then compared against `census.blockgroups_2020` using `ST_Covers` to count block groups that fall entirely within it.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
