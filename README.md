@@ -217,9 +217,9 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     Discuss your accessibility metric and how you arrived at it below:
 
-    **Description:**
+    **Description:**  Neighborhoods are different sizes and have different numbers of bus stops, so I looked at the percent of bus stops for which wheelchair boarding is possible and called that my ranking.
 
-6.  What are the _top five_ neighborhoods according to your accessibility metric?
+6.  What are the _top five_ neighborhoods according to your accessibility metric? Note: 125 neighborhoods tied with a score of 100 on my ranking.
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
 
@@ -242,7 +242,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
-    **Discussion:**
+    **Discussion:** I used overpass to create a geojson of Penn's campus with the query relation["name"="University of Pennsylvania"]["amenity"="university"]; out geom; I visually confirmed that the result looked like Penn's campus before exporting it. I then uploaded it as phl.penncampus.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
