@@ -1,4 +1,7 @@
 node_modules/
 __data__/
 __pgdata__/
+.envdata/PWD_PARCELS.geojson
+data/gtfs_public/google_bus/stop_times.txt
+.env
 .env
