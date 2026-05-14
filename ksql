@@ -1,0 +1,15 @@
+
+SELECT PostGIS_Version();
+
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+SELECT schema_name 
+FROM information_schema.schemata;
+
+SELECT * FROM pg_extension WHERE extname = 'postgis';
+
+SHOW search_path;
+
+SET search_path TO public, septa, census, phl;
+
+SELECT PostGIS_Version();

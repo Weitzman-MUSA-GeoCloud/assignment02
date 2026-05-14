@@ -3,10 +3,12 @@ services:
   db:
     # Database image pre-loaded with initial table structure
     image: ghcr.io/weitzman-musa-geocloud/assignment02:main
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: [
+      test: [_
           "CMD-SHELL",
           'psql -U postgres -d postgres -c "SELECT ST_Buffer( ST_SetSRID(''POINT(0 0)''::GEOMETRY, 4326), 1) AS geom ;"',
         ]

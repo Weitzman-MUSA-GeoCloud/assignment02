@@ -3,7 +3,6 @@
   estimation, consider any block group that intersects the buffer as being part
   of the 800 meter buffer.
 */
-
 with
 
 septa_bus_stop_blockgroups as (

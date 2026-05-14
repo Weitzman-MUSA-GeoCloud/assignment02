@@ -161,7 +161,25 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
 1.  Which **eight** bus stop have the largest population within 800 meters? As a rough estimation, consider any block group that intersects the buffer as being part of the 800 meter buffer.
 
+   i. Lombard St & 18th St (57936) 
+   ii. Rittenhouse Sq & 18th St (57571) 
+   iii. Snyder Av & 9th St	(57412) 
+   iv. 19th St & Lombard St (57019) 
+   v. Lombard St & 19th St	(57019) 
+   vi. Locust St & 16th St	(56309) 
+   vii. 16th St & Locust St (56309) 
+   viii. South St & 19th St (55789) 
+
 2.  Which **eight** bus stops have the smallest population above 500 people _inside of Philadelphia_ within 800 meters of the stop (Philadelphia county block groups have a geoid prefix of `42101` -- that's `42` for the state of PA, and `101` for Philadelphia county)?
+
+   i. Delaware Av & Tioga St (593) 
+   ii. Delaware Av & Venango St (593) 
+   iii. Delaware Av & Venango St	(593) 
+   iv. Northwestern Av & Stenton Av (655) 
+   v. Bethlehem Pk & Chesney Ln	(655) 
+   vi. Bethlehem Pk & Chesney Ln	(655) 
+   vii. Delaware Av & Wheatsheaf Ln (684) 
+   viii. Long Ln & Lewis Av (729) 
 
     **The queries to #1 & #2 should generate results with a single row, with the following structure:**
 
@@ -192,6 +210,8 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     _Your query should run in under two minutes._
 
+    Bucks County Community College and Oxford Valley Mall
+
     >_**HINT**: The `ST_MakeLine` function is useful here. You can see an example of how you could use it at [this MobilityData walkthrough](https://docs.mobilitydb.com/MobilityDB-workshop/master/ch04.html#:~:text=INSERT%20INTO%20shape_geoms) on using GTFS data. If you find other good examples, please share them in Slack._
 
     >_**HINT**: Use the query planner (`EXPLAIN`) to see if there might be opportunities to speed up your query with indexes. For reference, I got this query to run in about 15 seconds._
@@ -217,11 +237,15 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     Discuss your accessibility metric and how you arrived at it below:
 
-    **Description:**
+    **Description:** The metric is the percentage of bus stops within each neighborhood that are wheelchair accessible (wheelchair_boarding = 1), out of all stops     with a known accessibility status. A higher percentage means better accessibility.
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
+   Airport, Allegheny West, Andorra, Aston-Woodbridge, Academy Gardens
+
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
+
+   Bartram Village, Woodland Terrace, Southwest Schuylkill, Paschall, Cedar Park
 
     **Both #6 and #7 should have the structure:**
     ```sql
@@ -234,6 +258,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
 8.  With a query, find out how many census block groups Penn's main campus fully contains. Discuss which dataset you chose for defining Penn's campus.
+   57
 
     **Structure (should be a single value):**
     ```sql
@@ -242,9 +267,11 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
-    **Discussion:**
+    **Discussion:** I used the PWD parcels dataset to define Penn's campus, filtering for parcels where owner1 contains 'univ' and 'penn'. I then used ST_Union to     combine all parcels and ST_ConvexHull to create a solid campus boundary. Finally, I used ST_Contains to find block groups fully within that boundary.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
+
+    421010369022
 
     **Structure (should be a single value):**
     ```sql
