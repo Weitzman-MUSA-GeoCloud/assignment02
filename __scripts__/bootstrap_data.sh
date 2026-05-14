@@ -5,9 +5,9 @@ set -x
 
 POSTGRES_HOST=${POSTGRES_HOST:-localhost}
 POSTGRES_PORT=${POSTGRES_PORT:-5432}
-POSTGRES_NAME=${POSTGRES_NAME:-assn02}
+POSTGRES_NAME=${POSTGRES_NAME:-Assignment2}
 POSTGRES_USER=${POSTGRES_USER:-postgres}
-POSTGRES_PASS=${POSTGRES_PASS:-postgres}
+POSTGRES_PASS=${POSTGRES_PASS:-030110}
 PYTHON_COMMAND=${PYTHON_COMMAND:-python3}
 
 SEPTA_GTFS_ZIP_URL='https://github.com/septadev/GTFS/releases/download/v202502230/gtfs_public.zip'
@@ -18,6 +18,7 @@ PHILA_NEIGHBORHOODS_URL='https://github.com/opendataphilly/open-geo-data/raw/ref
 
 SCRIPTDIR=$(readlink -f $(dirname $0))
 DATADIR=$(readlink -f $(dirname $0)/../__data__)
+WIN_DATADIR=$(cygpath -m "${DATADIR}")
 mkdir -p ${DATADIR}
 
 # Download and unzip gtfs data
@@ -53,27 +54,42 @@ PGPASSWORD=${POSTGRES_PASS} psql \
 run_psql -f "${SCRIPTDIR}/create_tables.sql"
 
 # Load trip gtfs data into database
+#sed -i 's/\r//g' ${DATADIR}/google_bus/stops.txt
+#run_psql -c "\copy septa.bus_stops FROM '${DATADIR}/google_bus/stops.txt' DELIMITER ',' CSV HEADER;"
+
 sed -i 's/\r//g' ${DATADIR}/google_bus/stops.txt
-run_psql -c "\copy septa.bus_stops FROM '${DATADIR}/google_bus/stops.txt' DELIMITER ',' CSV HEADER;"
+run_psql -c "\copy septa.bus_stops FROM '${WIN_DATADIR}/google_bus/stops.txt' DELIMITER ',' CSV HEADER;"
+
+
 
 # Use sed to replace \r\n with \n in the google_bus/routes.txt file
-sed -i 's/\r//g' ${DATADIR}/google_bus/routes.txt
-run_psql -c "\copy septa.bus_routes FROM '${DATADIR}/google_bus/routes.txt' DELIMITER ',' CSV HEADER;"
+#sed -i 's/\r//g' ${DATADIR}/google_bus/routes.txt
+#run_psql -c "\copy septa.bus_routes FROM '${DATADIR}/google_bus/routes.txt' DELIMITER ',' CSV HEADER;"
 
+sed -i 's/\r//g' ${DATADIR}/google_bus/routes.txt
+run_psql -c "\copy septa.bus_routes FROM '${WIN_DATADIR}/google_bus/routes.txt' DELIMITER ',' CSV HEADER;"
+
+
+#sed -i 's/\r//g' ${DATADIR}/google_bus/trips.txt
+#run_psql -c "\copy septa.bus_trips FROM '${DATADIR}/google_bus/trips.txt' DELIMITER ',' CSV HEADER;"
 sed -i 's/\r//g' ${DATADIR}/google_bus/trips.txt
-run_psql -c "\copy septa.bus_trips FROM '${DATADIR}/google_bus/trips.txt' DELIMITER ',' CSV HEADER;"
+run_psql -c "\copy septa.bus_trips FROM '${WIN_DATADIR}/google_bus/trips.txt' DELIMITER ',' CSV HEADER;"
 
 sed -i 's/\r//g' ${DATADIR}/google_bus/shapes.txt
-run_psql -c "\copy septa.bus_shapes FROM '${DATADIR}/google_bus/shapes.txt' DELIMITER ',' CSV HEADER;"
+run_psql -c "\copy septa.bus_shapes FROM '${WIN_DATADIR}/google_bus/shapes.txt' DELIMITER ',' CSV HEADER;"
+#sed -i 's/\r//g' ${DATADIR}/google_bus/shapes.txt
+#run_psql -c "\copy septa.bus_shapes FROM '${DATADIR}/google_bus/shapes.txt' DELIMITER ',' CSV HEADER;"
 
 sed -i 's/\r//g' ${DATADIR}/google_rail/stops.txt
-run_psql -c "\copy septa.rail_stops FROM '${DATADIR}/google_rail/stops.txt' DELIMITER ',' CSV HEADER;"
+run_psql -c "\copy septa.rail_stops FROM '${WIN_DATADIR}/google_rail/stops.txt' DELIMITER ',' CSV HEADER;"
+#sed -i 's/\r//g' ${DATADIR}/google_rail/stops.txt
+#run_psql -c "\copy septa.rail_stops FROM '${DATADIR}/google_rail/stops.txt' DELIMITER ',' CSV HEADER;"
 
 
 # Download and unzip census population data (didn't find download url)
-if [ ! -f ${DATADIR}/census_population_2020.json ]; then
+if [ ! -f ${WIN_DATADIR}/census_population_2020.json ]; then
     echo "Downloading census population data..."
-    curl -L "${CENSUS_BLOCKGROUP_POP_URL}" > ${DATADIR}/census_population_2020.json
+    curl -L "${CENSUS_BLOCKGROUP_POP_URL}" > ${WIN_DATADIR}/census_population_2020.json
 fi
 # unzip -o ${DATADIR}/census_population.zip -d ${DATADIR}/census_population
 
@@ -83,8 +99,8 @@ import csv
 import json
 import pathlib
 
-RAW_DATA_DIR = pathlib.Path('${DATADIR}')
-PROCESSED_DATA_DIR = pathlib.Path('${DATADIR}')
+RAW_DATA_DIR = pathlib.Path('${WIN_DATADIR}')
+PROCESSED_DATA_DIR = pathlib.Path('${WIN_DATADIR}')
 
 with open(
     RAW_DATA_DIR / 'census_population_2020.json',
@@ -104,8 +120,9 @@ with open(
 EOF
 
 # load data into database
-run_psql -c "\copy census.population_2020 FROM '${DATADIR}/census_population_2020.csv' DELIMITER ',' CSV HEADER;"
-
+#run_psql -c "\copy census.population_2020 FROM '${DATADIR}/census_population_2020.csv' DELIMITER ',' CSV HEADER;"
+# load data into database
+run_psql -c "\copy census.population_2020 FROM '${WIN_DATADIR}/census_population_2020.csv' DELIMITER ',' CSV HEADER;"
 
 # Download and unzip PWD Stormwater Billing parcel data
 if [ ! -f ${DATADIR}/phl_pwd_parcels.zip ]; then

@@ -160,18 +160,28 @@ There are several datasets that are prescribed for you to use in this part. Belo
 ## Questions
 
 1.  Which **eight** bus stop have the largest population within 800 meters? As a rough estimation, consider any block group that intersects the buffer as being part of the 800 meter buffer.
+22272	Lombard St & 18th St	57936
+25080	Rittenhouse Sq & 18th St	57571
+24284	Snyder Av & 9th St	57412
+22273	Lombard St & 19th St	57019
+14958	19th St & Lombard St	57019
+3042	16th St & Locust St	56309
+25083	Locust St & 16th St	56309
+22241	South St & 19th St	55789
+
 
 2.  Which **eight** bus stops have the smallest population above 500 people _inside of Philadelphia_ within 800 meters of the stop (Philadelphia county block groups have a geoid prefix of `42101` -- that's `42` for the state of PA, and `101` for Philadelphia county)?
 
-    **The queries to #1 & #2 should generate results with a single row, with the following structure:**
 
-    ```sql
-    (
-        stop_id text, -- The ID of the station
-        stop_name text, -- The name of the station
-        estimated_pop_800m integer -- The population within 800 meters
-    )
-    ```
+
+30840	Delaware Av & Tioga St	593
+31499	Delaware Av & Castor Av	593
+31500	Delaware Av & Venango St	593
+27000	Bethlehem Pk & Chesney Ln	655
+27152	Bethlehem Pk & Chesney Ln	655
+31788	Northwestern Av & Stenton Av	655
+30839	Delaware Av & Wheatsheaf Ln	684
+19603	Long Ln & Glenwood Av - FS	729
 
 3.  Using the Philadelphia Water Department Stormwater Billing Parcels dataset, pair each parcel with its closest bus stop. The final result should give the parcel address, bus stop name, and distance apart in meters, rounded to two decimals. Order by distance (largest on top).
 
@@ -190,26 +200,10 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
 4.  Using the `bus_shapes`, `bus_routes`, and `bus_trips` tables from GTFS bus feed, find the **two** routes with the longest trips.
 
-    _Your query should run in under two minutes._
+130	Bucks County Community College	46684
+128	Oxford Valley Mall	44044
 
-    >_**HINT**: The `ST_MakeLine` function is useful here. You can see an example of how you could use it at [this MobilityData walkthrough](https://docs.mobilitydb.com/MobilityDB-workshop/master/ch04.html#:~:text=INSERT%20INTO%20shape_geoms) on using GTFS data. If you find other good examples, please share them in Slack._
 
-    >_**HINT**: Use the query planner (`EXPLAIN`) to see if there might be opportunities to speed up your query with indexes. For reference, I got this query to run in about 15 seconds._
-
-    >_**HINT**: The `row_number` window function could also be useful here. You can read more about window functions [in the PostgreSQL documentation](https://www.postgresql.org/docs/9.1/tutorial-window.html). That documentation page uses the `rank` function, which is very similar to `row_number`. For more info about window functions you can check out:_
-    >*   📑 [_An Easy Guide to Advanced SQL Window Functions_](https://medium.com/data-science/a-guide-to-advanced-sql-window-functions-f63f2642cbf9) in Towards Data Science, by Julia Kho
-    >*   🎥 [_SQL Window Functions for Data Scientists_](https://www.youtube.com/watch?v=e-EL-6Vnkbg) (and a [follow up](https://www.youtube.com/watch?v=W_NBnkLLh7M) with examples) on YouTube, by Emma Ding
-    >*   📖 Chapter 16: Analytic Functions in Learning SQL, 3rd Edition for a deep dive (see the [books](https://github.com/Weitzman-MUSA-GeoCloud/course-info/tree/main/week01#books) listed in week 1, which you can access on [O'Reilly for Higher Education](http://pwp.library.upenn.edu.proxy.library.upenn.edu/loggedin/pwp/pw-oreilly.html))
-    
-
-    **Structure:**
-    ```sql
-    (
-        route_short_name text,  -- The short name of the route
-        trip_headsign text,  -- Headsign of the trip
-        shape_length numeric  -- Length of the trip in meters, rounded to the nearest meter
-    )
-    ```
 
 5.  Rate neighborhoods by their bus stop accessibility for wheelchairs. Use OpenDataPhilly's neighborhood dataset along with an appropriate dataset from the Septa GTFS bus feed. Use the [GTFS documentation](https://gtfs.org/reference/static/) for help. Use some creativity in the metric you devise in rating neighborhoods.
 
@@ -219,52 +213,44 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     **Description:**
 
+
+
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
+
+Academy Gardens	100.00	30	
+Airport	100.00	20	
+Allegheny West	100.00	96	
+Andorra	100.00	19	
+Aston-Woodbridge	100.00	29	
 
 7.  What are the _bottom five_ neighborhoods according to your accessibility metric?
 
-    **Both #6 and #7 should have the structure:**
-    ```sql
-    (
-      neighborhood_name text,  -- The name of the neighborhood
-      accessibility_metric ...,  -- Your accessibility metric value
-      num_bus_stops_accessible integer,
-      num_bus_stops_inaccessible integer
-    )
-    ```
+
+Bartram Village	0.00		14
+Woodland Terrace	20.00	2	8
+Southwest Schuylkill	44.23	23	29
+Paschall	45.71	32	38
+Cedar Park	50.00	20	20
+
+
 
 8.  With a query, find out how many census block groups Penn's main campus fully contains. Discuss which dataset you chose for defining Penn's campus.
 
-    **Structure (should be a single value):**
-    ```sql
-    (
-        count_block_groups integer
-    )
-    ```
-
+11
     **Discussion:**
+
+    I defined Penn’s main campus using the **University City** neighborhood from the OpenDataPhilly `phl.neighborhoods` dataset. University City is the named neighborhood that contains the University of Pennsylvania’s core campus. The query counts census block groups whose geometry is fully inside that neighborhood polygon using `ST_Within(block_group, university_city)`. Using a single neighborhood polygon from the same source as other spatial layers keeps the analysis consistent and reproducible. A more precise option would be a campus boundary from Penn or the city, but that would require an extra dataset; the University City neighborhood is a reasonable and commonly used proxy for “Penn’s area” in Philadelphia analyses.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
-    **Structure (should be a single value):**
-    ```sql
-    (
-        geo_id text
-    )
-    ```
+
+421010357021
+
+
 
 10. You're tasked with giving more contextual information to rail stops to fill the `stop_desc` field in a GTFS feed. Using any of the data sets above, PostGIS functions (e.g., `ST_Distance`, `ST_Azimuth`, etc.), and PostgreSQL string functions, build a description (alias as `stop_desc`) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible), and other methods of describing the relationships. SQL's `CASE` statements may be helpful for some operations.
 
-    **Structure:**
-    ```sql
-    (
-        stop_id integer,
-        stop_name text,
-        stop_desc text,
-        stop_lon double precision,
-        stop_lat double precision
-    )
-    ```
+
 
    As an example, your `stop_desc` for a station stop may be something like "37 meters NE of 1234 Market St" (that's only an example, feel free to be creative, silly, descriptive, etc.)
 
