@@ -217,7 +217,9 @@ There are several datasets that are prescribed for you to use in this part. Belo
 
     Discuss your accessibility metric and how you arrived at it below:
 
-    **Description:**
+    **Description:** I measure neighborhood wheelchair bus-stop accessibility using a 200 m service-area coverage rate. For each Philadelphia neighborhood, I compute the share of neighborhood area that lies within 200 m of at least one wheelchair-accessible bus stop.
+    
+    To calculate, I identify bus stops that fall inside each neighborhood polygon, classify stops using GTFS `wheelchair_boarding`, create 200 m buffers around accessible stops and dissolve them into a single polygon, intersect the dissolved buffers with the neighborhood boundary, and divide the covered area by the neighborhood’s total area. Calculations are performed in a projected CRS (EPSG:26918).
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
@@ -242,7 +244,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     )
     ```
 
-    **Discussion:**
+    **Discussion:** I define Penn’s main campus using the OpenStreetMap “University of Pennsylvania” boundary (relation 2594845), exported via Overpass Turbo, loaded into PostGIS with ogr2ogr, and dissolve the campus geometry and count 2020 census block groups fully covered by this campus polygon.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
