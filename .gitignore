@@ -1,4 +1,7 @@
 node_modules/
 __data__/
 __pgdata__/
+.venv
 .env
+data/
+assignment02-commands.txt
